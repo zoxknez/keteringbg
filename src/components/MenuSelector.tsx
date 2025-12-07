@@ -2,9 +2,10 @@
 
 import { useState, useActionState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Check, ChevronRight, ArrowLeft, Utensils, ChevronDown } from 'lucide-react'
+import { Check, ChevronRight, ArrowLeft, ChevronDown, Plus, Minus, ShoppingCart, Trash2, X } from 'lucide-react'
 import { submitOrder } from '@/app/actions'
 import Image from 'next/image'
+import { useTranslations, useLocale } from 'next-intl'
 
 type Dish = {
   id: string
@@ -22,8 +23,19 @@ type Menu = {
   id: string
   name: string
   dishCount: number
-  price: any
+  price: number
   dishes: Dish[]
+}
+
+// Stavka u porudžbini
+interface OrderItem {
+  id: string // unique id za stavku
+  menuId: string
+  menuName: string
+  menuPrice: number
+  dishCount: number
+  selectedDishes: Dish[]
+  portions: number
 }
 
 interface MenuSelectorProps {
@@ -34,8 +46,6 @@ const initialState = {
   success: false,
   message: '',
 }
-
-import { useTranslations, useLocale } from 'next-intl'
 
 // Emoji za tagove jela
 const tagEmojis: Record<string, string> = {
@@ -51,14 +61,32 @@ const tagEmojis: Record<string, string> = {
 export default function MenuSelector({ menus }: MenuSelectorProps) {
   const t = useTranslations('Menu')
   const tCheckout = useTranslations('Checkout')
+  const tOrder = useTranslations('Order')
   const locale = useLocale()
-  const [step, setStep] = useState<'menu' | 'dishes' | 'checkout'>('menu')
+  
+  // Koraci: menu -> dishes -> order -> checkout
+  const [step, setStep] = useState<'menu' | 'dishes' | 'order' | 'checkout'>('menu')
+  
+  // Trenutno selektovani meni i jela
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null)
   const [selectedDishIds, setSelectedDishIds] = useState<string[]>([])
+  const [currentPortions, setCurrentPortions] = useState<number>(1)
+  
+  // Porudžbina - lista stavki
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([])
+  
+  // Modal za potvrdu nakon dodavanja
+  const [showAddedModal, setShowAddedModal] = useState(false)
+  
+  // Filteri
   const [activeFilter, setActiveFilter] = useState<string>('ALL')
   const [expandedCategories, setExpandedCategories] = useState<string[]>([])
   
   const [state, formAction] = useActionState(submitOrder, initialState)
+
+  // Izračunaj ukupnu cenu porudžbine
+  const totalPrice = orderItems.reduce((sum, item) => sum + (item.menuPrice * item.portions), 0)
+  const totalPortions = orderItems.reduce((sum, item) => sum + item.portions, 0)
 
   const toggleCategory = (category: string) => {
     setExpandedCategories(prev => 
@@ -72,6 +100,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
     setSelectedMenu(menu)
     setStep('dishes')
     setSelectedDishIds([])
+    setCurrentPortions(1)
     setActiveFilter('ALL')
     setExpandedCategories([])
   }
@@ -84,6 +113,54 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
         setSelectedDishIds(prev => [...prev, dishId])
       }
     }
+  }
+
+  // Dodaj u porudžbinu
+  const addToOrder = () => {
+    if (!selectedMenu || selectedDishIds.length !== selectedMenu.dishCount) return
+
+    const selectedDishObjects = selectedMenu.dishes.filter(d => selectedDishIds.includes(d.id))
+    
+    const newItem: OrderItem = {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      menuId: selectedMenu.id,
+      menuName: selectedMenu.name,
+      menuPrice: selectedMenu.price,
+      dishCount: selectedMenu.dishCount,
+      selectedDishes: selectedDishObjects,
+      portions: currentPortions
+    }
+
+    setOrderItems(prev => [...prev, newItem])
+    setShowAddedModal(true) // Prikaži modal umesto direktnog prelaska
+    setSelectedMenu(null)
+    setSelectedDishIds([])
+    setCurrentPortions(1)
+  }
+
+  // Nastavi sa dodavanjem
+  const continueOrdering = () => {
+    setShowAddedModal(false)
+    setStep('menu')
+  }
+
+  // Završi porudžbinu
+  const finishOrdering = () => {
+    setShowAddedModal(false)
+    setStep('order')
+  }
+
+  // Obriši stavku iz porudžbine
+  const removeOrderItem = (itemId: string) => {
+    setOrderItems(prev => prev.filter(item => item.id !== itemId))
+  }
+
+  // Dodaj još jednu stavku
+  const addMoreItems = () => {
+    setStep('menu')
+    setSelectedMenu(null)
+    setSelectedDishIds([])
+    setCurrentPortions(1)
   }
 
   const currentDishes = selectedMenu ? selectedMenu.dishes : []
@@ -112,8 +189,41 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
     FASTING: { icon: '🌱', label: t('categories.FASTING'), color: 'text-emerald-400', bgColor: 'bg-emerald-500/10' },
   }
 
+  // Pripremi podatke za slanje
+  const prepareOrderData = () => {
+    return {
+      items: orderItems.map(item => ({
+        menuId: item.menuId,
+        menuName: item.menuName,
+        menuPrice: item.menuPrice,
+        portions: item.portions,
+        totalPrice: item.menuPrice * item.portions,
+        selectedDishIds: item.selectedDishes.map(d => d.id),
+        selectedDishNames: item.selectedDishes.map(d => d.name)
+      })),
+      totalPrice,
+      totalPortions
+    }
+  }
+
   return (
     <div className="w-full">
+      {/* Floating Order Badge */}
+      {orderItems.length > 0 && step !== 'order' && step !== 'checkout' && (
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          onClick={() => setStep('order')}
+          className="fixed bottom-6 right-6 z-50 bg-amber-500 text-black px-6 py-4 rounded-2xl shadow-2xl shadow-amber-500/30 flex items-center gap-3 hover:bg-amber-400 transition-all duration-300"
+        >
+          <ShoppingCart className="w-5 h-5" />
+          <span className="font-bold">{tOrder('viewOrder')}</span>
+          <span className="bg-black text-amber-500 px-2 py-1 rounded-lg text-sm font-bold">
+            {orderItems.length}
+          </span>
+        </motion.button>
+      )}
+
       <AnimatePresence>
         {state.success && (
           <motion.div 
@@ -132,18 +242,66 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-4">{tCheckout('successTitle')}</h2>
               <p className="text-neutral-400 text-lg mb-10 leading-relaxed">{tCheckout('successMessage')}</p>
               
+              <button 
+                onClick={() => window.location.reload()}
+                className="w-full py-4 bg-amber-500 text-black hover:bg-amber-400 rounded-xl font-semibold text-sm uppercase tracking-widest transition-all duration-300 shadow-lg hover:shadow-amber-500/25"
+              >
+                {tCheckout('newOrder')}
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal - Dodato u porudžbinu */}
+      <AnimatePresence>
+        {showAddedModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-neutral-900 border border-white/10 p-8 rounded-3xl text-center max-w-md w-full shadow-2xl shadow-amber-500/20 relative"
+            >
+              {/* Success icon */}
+              <div className="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-500/30">
+                <Check className="w-10 h-10 text-amber-500" />
+              </div>
+              
+              <h2 className="text-2xl md:text-3xl font-serif font-bold text-white mb-3">
+                {tOrder('addedTitle')}
+              </h2>
+              <p className="text-neutral-400 mb-8 leading-relaxed">
+                {tOrder('addedMessage')}
+              </p>
+
+              {/* Ukupno trenutno */}
+              <div className="bg-white/5 rounded-xl p-4 mb-6 border border-white/10">
+                <p className="text-neutral-500 text-sm mb-1">{tOrder('currentTotal')}</p>
+                <p className="text-2xl font-bold text-amber-500">
+                  {orderItems.length} {orderItems.length === 1 ? tOrder('item') : tOrder('items')} • {totalPrice.toLocaleString()} {t('units.rsd')}
+                </p>
+              </div>
+              
               <div className="flex flex-col gap-3">
                 <button 
-                  onClick={() => window.location.reload()}
-                  className="w-full py-4 bg-amber-500 text-black hover:bg-amber-400 rounded-xl font-semibold text-sm uppercase tracking-widest transition-all duration-300 shadow-lg hover:shadow-amber-500/25"
+                  onClick={continueOrdering}
+                  className="w-full py-4 bg-white/10 text-white hover:bg-white/20 rounded-xl font-semibold text-sm uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2"
                 >
-                  {tCheckout('newOrder')}
+                  <Plus className="w-4 h-4" />
+                  {tOrder('addMoreItems')}
                 </button>
                 <button 
-                  onClick={() => window.location.reload()}
-                  className="w-full py-4 bg-white/5 text-white hover:bg-white/10 rounded-xl font-semibold text-sm uppercase tracking-widest transition-all duration-300"
+                  onClick={finishOrdering}
+                  className="w-full py-4 bg-amber-500 text-black hover:bg-amber-400 rounded-xl font-semibold text-sm uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2"
                 >
-                  {t('back')}
+                  <ShoppingCart className="w-4 h-4" />
+                  {tOrder('finishOrder')}
                 </button>
               </div>
             </motion.div>
@@ -152,6 +310,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
       </AnimatePresence>
 
       <AnimatePresence mode="wait">
+        {/* KORAK 1: Izbor menija */}
         {step === 'menu' && (
           <motion.div 
             key="menu"
@@ -215,6 +374,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
           </motion.div>
         )}
 
+        {/* KORAK 2: Izbor jela + broj porcija */}
         {step === 'dishes' && selectedMenu && (
           <motion.div
             key="dishes"
@@ -227,7 +387,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
             {/* Sticky Header */}
             <div className="sticky top-4 z-40 bg-neutral-900/90 backdrop-blur-xl rounded-2xl border border-white/10 mx-auto max-w-4xl">
               <div className="px-6 py-4 flex items-center justify-between">
-                <button onClick={() => setStep('menu')} className="flex items-center gap-3 group">
+                <button onClick={() => setStep(orderItems.length > 0 ? 'order' : 'menu')} className="flex items-center gap-3 group">
                   <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-500 text-neutral-400 group-hover:text-black transition-all duration-300">
                     <ArrowLeft className="w-4 h-4" />
                   </div>
@@ -255,13 +415,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                   </div>
                 </div>
 
-                <button 
-                  disabled={selectedDishIds.length !== selectedMenu.dishCount}
-                  onClick={() => setStep('checkout')}
-                  className="px-6 py-3 bg-amber-500 text-black hover:bg-amber-400 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl font-semibold text-sm transition-all duration-300"
-                >
-                  {t('next')}
-                </button>
+                <div className="w-24" /> {/* Spacer */}
               </div>
             </div>
 
@@ -415,9 +569,181 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                 </div>
               )})}
             </div>
+
+            {/* Bottom Action Bar - Izbor porcija i dodavanje */}
+            <AnimatePresence>
+              {selectedDishIds.length === selectedMenu.dishCount && (
+                <motion.div
+                  initial={{ y: 100, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 100, opacity: 0 }}
+                  className="fixed bottom-0 left-0 right-0 z-50 bg-neutral-900/95 backdrop-blur-xl border-t border-white/10 p-4 md:p-6"
+                >
+                  <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center gap-4">
+                    {/* Porcije kontrola */}
+                    <div className="flex items-center gap-4 bg-white/5 rounded-xl px-4 py-3">
+                      <span className="text-neutral-400 text-sm font-medium">{tOrder('portions')}:</span>
+                      <button 
+                        onClick={() => setCurrentPortions(Math.max(1, currentPortions - 1))}
+                        className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="text-2xl font-bold text-white w-12 text-center">{currentPortions}</span>
+                      <button 
+                        onClick={() => setCurrentPortions(currentPortions + 1)}
+                        className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Cena */}
+                    <div className="flex-1 text-center sm:text-left">
+                      <p className="text-neutral-500 text-sm">{tOrder('subtotal')}</p>
+                      <p className="text-2xl font-bold text-amber-500">
+                        {(selectedMenu.price * currentPortions).toLocaleString()} {t('units.rsd')}
+                      </p>
+                    </div>
+
+                    {/* Dodaj dugme */}
+                    <button
+                      onClick={addToOrder}
+                      className="w-full sm:w-auto px-8 py-4 bg-amber-500 text-black hover:bg-amber-400 rounded-xl font-bold text-sm uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-3"
+                    >
+                      <Plus className="w-5 h-5" />
+                      {tOrder('addToOrder')}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 
+        {/* KORAK 3: Pregled porudžbine */}
+        {step === 'order' && (
+          <motion.div
+            key="order"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-3xl mx-auto"
+          >
+            <div className="bg-neutral-900/80 backdrop-blur-xl rounded-3xl p-6 md:p-10 border border-white/10 relative overflow-hidden">
+              {/* Decorative accent */}
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-amber-600" />
+              
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl md:text-3xl font-serif font-bold text-white flex items-center gap-3">
+                  <ShoppingCart className="w-8 h-8 text-amber-500" />
+                  {tOrder('title')}
+                </h2>
+                {orderItems.length > 0 && (
+                  <span className="px-4 py-2 bg-amber-500/20 text-amber-400 rounded-full text-sm font-bold">
+                    {orderItems.length} {orderItems.length === 1 ? tOrder('item') : tOrder('items')}
+                  </span>
+                )}
+              </div>
+
+              {orderItems.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <ShoppingCart className="w-10 h-10 text-neutral-600" />
+                  </div>
+                  <p className="text-neutral-500 mb-6">{tOrder('empty')}</p>
+                  <button
+                    onClick={() => setStep('menu')}
+                    className="px-8 py-4 bg-amber-500 text-black hover:bg-amber-400 rounded-xl font-bold text-sm uppercase tracking-widest transition-all"
+                  >
+                    {tOrder('startOrdering')}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* Lista stavki */}
+                  <div className="space-y-4 mb-8">
+                    {orderItems.map((item, index) => (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="bg-white/5 rounded-2xl p-5 border border-white/10 group"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="text-lg font-bold text-white">{item.menuName}</h4>
+                            <p className="text-sm text-neutral-500">
+                              {item.portions} × {item.menuPrice} {t('units.rsd')}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-xl font-bold text-amber-500">
+                              {(item.menuPrice * item.portions).toLocaleString()} {t('units.rsd')}
+                            </span>
+                            <button
+                              onClick={() => removeOrderItem(item.id)}
+                              className="w-10 h-10 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center text-red-400 hover:text-red-300 transition-all opacity-0 group-hover:opacity-100"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                        
+                        {/* Jela */}
+                        <div className="flex flex-wrap gap-2">
+                          {item.selectedDishes.map(dish => (
+                            <span 
+                              key={dish.id}
+                              className="px-3 py-1 bg-white/5 rounded-lg text-sm text-neutral-400 flex items-center gap-1"
+                            >
+                              {dish.tags?.[0] && <span>{tagEmojis[dish.tags[0]]}</span>}
+                              {dish.name}
+                            </span>
+                          ))}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Dodaj još */}
+                  <button
+                    onClick={addMoreItems}
+                    className="w-full py-4 border-2 border-dashed border-white/20 hover:border-amber-500/50 rounded-2xl text-neutral-400 hover:text-amber-500 font-medium flex items-center justify-center gap-3 transition-all duration-300 mb-8"
+                  >
+                    <Plus className="w-5 h-5" />
+                    {tOrder('addMore')}
+                  </button>
+
+                  {/* Ukupno */}
+                  <div className="bg-gradient-to-r from-amber-500/20 to-amber-600/20 rounded-2xl p-6 border border-amber-500/30 mb-6">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-neutral-400">{tOrder('totalPortions')}:</span>
+                      <span className="text-white font-bold">{totalPortions}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xl text-white font-medium">{tOrder('totalPrice')}:</span>
+                      <span className="text-3xl font-bold text-amber-500">{totalPrice.toLocaleString()} {t('units.rsd')}</span>
+                    </div>
+                  </div>
+
+                  {/* Nastavi na checkout */}
+                  <button
+                    onClick={() => setStep('checkout')}
+                    className="w-full py-5 bg-amber-500 text-black hover:bg-amber-400 rounded-xl font-bold text-sm uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-amber-500/20"
+                  >
+                    {tOrder('continue')}
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* KORAK 4: Checkout */}
         {step === 'checkout' && (
           <motion.div
             key="checkout"
@@ -431,23 +757,33 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
               {/* Decorative accent */}
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-amber-600" />
               
-              <button onClick={() => setStep('dishes')} className="flex items-center gap-3 group mb-10">
+              <button onClick={() => setStep('order')} className="flex items-center gap-3 group mb-8">
                 <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-500 text-slate-400 group-hover:text-slate-900 transition-all duration-300">
                   <ArrowLeft className="w-4 h-4" />
                 </div>
                 <span className="text-sm font-semibold text-neutral-500 group-hover:text-white transition-colors">
-                  {t('back')}
+                  {tOrder('backToOrder')}
                 </span>
               </button>
+
+              {/* Order Summary */}
+              <div className="bg-white/5 rounded-2xl p-4 mb-8 border border-white/10">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-neutral-500 text-sm">{tOrder('orderSummary')}</p>
+                    <p className="text-white font-medium">{orderItems.length} {orderItems.length === 1 ? tOrder('item') : tOrder('items')}, {totalPortions} {tOrder('portionsLabel')}</p>
+                  </div>
+                  <span className="text-2xl font-bold text-amber-500">{totalPrice.toLocaleString()} {t('units.rsd')}</span>
+                </div>
+              </div>
               
-              <div className="mb-10">
+              <div className="mb-8">
                 <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-3">{tCheckout('title')}</h2>
                 <p className="text-neutral-500">{tCheckout('disclaimer')}</p>
               </div>
               
               <form action={formAction} className="space-y-6">
-                <input type="hidden" name="menuId" value={selectedMenu?.id} />
-                <input type="hidden" name="selectedDishIds" value={JSON.stringify(selectedDishIds)} />
+                <input type="hidden" name="orderData" value={JSON.stringify(prepareOrderData())} />
                 <input type="hidden" name="locale" value={locale} />
                 
                 <div className="grid md:grid-cols-2 gap-6">
@@ -473,31 +809,15 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                   </div>
                 </div>
                 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-semibold text-neutral-300 mb-2">{tCheckout('email')}</label>
-                    <input 
-                      required 
-                      name="clientEmail" 
-                      type="email" 
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700"
-                      placeholder="vas@email.com"
-                    />
-                  </div>
-                  <div className="bg-amber-500/10 border border-amber-500/50 rounded-2xl overflow-hidden relative group hover:bg-amber-500/20 transition-colors duration-300">
-                    <label className="block text-xs font-bold text-amber-500 uppercase tracking-widest mb-0 px-4 pt-3">{tCheckout('portions')}</label>
-                    <input 
-                      required 
-                      name="portions" 
-                      type="number" 
-                      min="1"
-                      defaultValue="1"
-                      className="w-full bg-transparent border-none px-4 pb-4 pt-1 text-white text-3xl font-bold focus:ring-0 focus:outline-none placeholder:text-neutral-700 appearance-none"
-                    />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <Utensils className="w-6 h-6 text-amber-500/50 group-hover:text-amber-500 transition-colors" />
-                    </div>
-                  </div>
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-300 mb-2">{tCheckout('email')}</label>
+                  <input 
+                    required 
+                    name="clientEmail" 
+                    type="email" 
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700"
+                    placeholder="vas@email.com"
+                  />
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
