@@ -96,7 +96,7 @@ export async function submitOrder(prevState: any, formData: FormData) {
     try {
       await resend.emails.send({
         from: 'Ketering Beograd <onboarding@resend.dev>',
-        to: ['zoxknez@hotmail.com'], // Owner email (sandbox mode - must match Resend account)
+        to: ['spalevic.dragan@gmail.com'], // Owner email
         replyTo: clientEmail, // Allows direct reply to customer
         subject: `🍽️ Nova Porudžbina: ${clientName} - ${order.menu.name}`,
         html: `
