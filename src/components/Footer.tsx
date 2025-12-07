@@ -58,10 +58,10 @@ export default function Footer() {
 
           {/* Info */}
           <div className="space-y-6">
-            <h4 className="text-sm font-bold uppercase tracking-widest text-white">Info</h4>
+            <h4 className="text-sm font-bold uppercase tracking-widest text-white">{t('info')}</h4>
             <div className="space-y-2 text-sm">
               <p className="font-medium text-white">Dragan Spalević PR</p>
-              <p className="text-neutral-500">Ketering Beograd</p>
+              <p className="text-neutral-500">{t('cateringBelgrade')}</p>
               <p className="text-neutral-500">PIB: 114970001</p>
               <p className="text-neutral-500">MB: 67992032</p>
             </div>
@@ -73,10 +73,10 @@ export default function Footer() {
       <div className="border-t border-stone-800">
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-neutral-500">
-            &copy; {new Date().getFullYear()} Ketering Beograd. {t('rights')}
+            &copy; {new Date().getFullYear()} {t('cateringBelgrade')}. {t('rights')}
           </p>
           <p className="text-xs text-neutral-600">
-            Kreirao sa ❤️ za savršene događaje
+            {t('createdWith')}
           </p>
         </div>
       </div>

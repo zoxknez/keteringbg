@@ -794,7 +794,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                       name="clientName" 
                       type="text" 
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700"
-                      placeholder="Vaše ime i prezime"
+                      placeholder={tCheckout('namePlaceholder')}
                     />
                   </div>
                   <div>
@@ -804,7 +804,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                       name="clientPhone" 
                       type="tel" 
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700"
-                      placeholder="+381 6..."
+                      placeholder={tCheckout('phonePlaceholder')}
                     />
                   </div>
                 </div>
@@ -816,7 +816,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                     name="clientEmail" 
                     type="email" 
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700"
-                    placeholder="vas@email.com"
+                    placeholder={tCheckout('emailPlaceholder')}
                   />
                 </div>
 
@@ -828,7 +828,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                       name="address" 
                       type="text" 
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700"
-                      placeholder="Ulica i broj, Grad"
+                      placeholder={tCheckout('addressPlaceholder')}
                     />
                   </div>
                   <div>
@@ -849,7 +849,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                     name="message" 
                     rows={4} 
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700 resize-none"
-                    placeholder="..."
+                    placeholder={tCheckout('notePlaceholder')}
                   ></textarea>
                 </div>
 
