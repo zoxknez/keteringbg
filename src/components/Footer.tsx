@@ -39,7 +39,7 @@ export default function Footer() {
                 <div className="w-10 h-10 rounded-full bg-neutral-800 group-hover:bg-amber-500 flex items-center justify-center transition-colors duration-300">
                   <Phone className="w-4 h-4" />
                 </div>
-                <span className="group-hover:text-white transition-colors">063 704 4428</span>
+                <span className="group-hover:text-white transition-colors">+381 63 704 4428</span>
               </a>
               <a href="mailto:spalevic.dragan@gmail.com" className="flex items-center gap-3 group">
                 <div className="w-10 h-10 rounded-full bg-neutral-800 group-hover:bg-amber-500 flex items-center justify-center transition-colors duration-300">

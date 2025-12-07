@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 import { X, Phone, ArrowLeft } from 'lucide-react'
 
 const PHONE_NUMBER = '+381637044428'
-const PHONE_DISPLAY = '063 704 4428'
+const PHONE_DISPLAY = '+381 63 704 4428'
 
 export default function ContactButton() {
   const t = useTranslations('Index.hero')
