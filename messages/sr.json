@@ -7,9 +7,22 @@
       "titleLine1": "Savršen",
       "titleLine2": "Ukus",
       "subtitle": "Ekskluzivni ketering za <bold>korporativne događaje</bold> i <bold>nezaboravne proslave</bold>",
-      "ctaMenu": "Izaberi Meni",
-      "ctaCorporate": "Za Firme",
-      "scroll": "Skroluj"
+      "ctaMenu": "Izaberite Meni",
+      "ctaGallery": "Pogledajte Naša Jela",
+      "notice24h": "* Porudžbine je potrebno izvršiti minimum 24h unapred",
+      "ctaCorporate": "Personalizacija Ponude Za Firme",
+      "corporateModal": {
+        "title": "Personalizovana Ponuda za Firme",
+        "description": "Svaki dogovor je moguć! Nudimo posebne benefite i popuste za dugoročne ugovore i redovne porudžbine.",
+        "benefits": [
+          "Fleksibilan izbor menija",
+          "Posebne cene za dugoročnu saradnju",
+          "Prioritetna isporuka",
+          "Mogućnost plaćanja preko računa"
+        ],
+        "contact": "Kontaktirajte nas za dogovor"
+      },
+      "scroll": "Istražite"
     },
     "trust": {
       "events": "500+ Događaja",
@@ -20,7 +33,7 @@
   "Menu": {
     "dishes": "Jela",
     "description": "Idealan izbor za manje i srednje proslave. Uključuje predjelo, glavno jelo i dezert.",
-    "select": "Izaberi Meni",
+    "select": "Izaberite Meni",
     "selected": "Izabrano",
     "back": "Nazad",
     "next": "Dalje",
@@ -31,16 +44,51 @@
     "chooseDishes": "Izaberite jela koja želite",
     "dishDescription": "Ekskluzivno pripremljeno od najsvežijih sastojaka.",
     "menuLabel": "Meni",
-    "popular": "Popularno"
+    "popular": "Popularno",
+    "tags": {
+      "PORK": "Svinjetina",
+      "CHICKEN": "Piletina",
+      "BEEF": "Junetina",
+      "FISH": "Riba",
+      "VEGETARIAN": "Vegetarijansko",
+      "VEGAN": "Vegansko",
+      "FASTING": "Posno"
+    },
+    "categories": {
+      "CHICKEN": "Pileća jela",
+      "PORK": "Jela od svinjetine",
+      "BEEF": "Jela od junetine",
+      "MIXED": "Mešana jela",
+      "FISH": "Riblja jela",
+      "FASTING": "Posna jela"
+    },
+    "menuDetails": {
+      "menu1": "Porcija 500g + hleb + salata",
+      "menu2": "Porcija 500g + hleb + salata + supa/čorba",
+      "menu3": "Porcija 500g + hleb + salata + supa/čorba + desert"
+    },
+    "units": {
+      "rsd": "RSD",
+      "portion": "/ porcija"
+    },
+    "filters": {
+      "all": "Sva jela"
+    },
+    "available": "dostupno",
+    "open": "Otvori",
+    "close": "Zatvori"
   },
   "Checkout": {
     "title": "Vaši Podaci",
-    "changeDishes": "Izmeni Jela",
+    "changeDishes": "Izmenite Jela",
     "name": "Ime i Prezime",
     "phone": "Telefon",
     "email": "Email Adresa",
-    "note": "Dodatna Napomena (Datum, Lokacija...)",
-    "submit": "Pošalji Upit",
+    "portions": "Broj Porcija",
+    "address": "Adresa Dostave",
+    "dateTime": "Datum i Vreme",
+    "note": "Napomena (Alergije, posebni zahtevi...)",
+    "submit": "Pošaljite Upit",
     "disclaimer": "Klikom na dugme šaljete upit. Kontaktiraćemo vas uskoro radi potvrde.",
     "successTitle": "Hvala Vam!",
     "successMessage": "Vaša porudžbina je uspešno poslata!",
@@ -52,5 +100,13 @@
     "brand": "Ketering Beograd",
     "description": "Vaš partner za nezaboravne gastronomske doživljaje. Profesionalni ketering za korporativne događaje i privatne proslave.",
     "contact": "Kontakt"
+  },
+  "Gallery": {
+    "subtitle": "Naša Kujna",
+    "title": "Pogledajte Naša Jela",
+    "description": "Svako jelo pripremamo sa ljubavlju i pažnjom, koristeći samo najsvežije sastojke.",
+    "video": "Video",
+    "viewAll": "Pogledajte Sve Slike",
+    "dishAlt": "Jelo"
   }
 }

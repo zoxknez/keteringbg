@@ -8,8 +8,21 @@
       "titleLine2": "Taste",
       "subtitle": "Exclusive catering for <bold>corporate events</bold> and <bold>unforgettable celebrations</bold>",
       "ctaMenu": "Select Menu",
-      "ctaCorporate": "For Companies",
-      "scroll": "Scroll"
+      "ctaGallery": "See Our Dishes",
+      "notice24h": "* Orders must be placed at least 24h in advance",
+      "ctaCorporate": "Corporate Offer Personalization",
+      "corporateModal": {
+        "title": "Personalized Corporate Offer",
+        "description": "Every agreement is possible! We offer special benefits and discounts for long-term contracts and regular orders.",
+        "benefits": [
+          "Flexible menu selection",
+          "Special prices for long-term cooperation",
+          "Priority delivery",
+          "Invoice payment available"
+        ],
+        "contact": "Contact us for an agreement"
+      },
+      "scroll": "Explore"
     },
     "trust": {
       "events": "500+ Events",
@@ -31,7 +44,39 @@
     "chooseDishes": "Choose the dishes you want",
     "dishDescription": "Exclusively prepared from the freshest ingredients.",
     "menuLabel": "Menu",
-    "popular": "Popular"
+    "popular": "Popular",
+    "tags": {
+      "PORK": "Pork",
+      "CHICKEN": "Chicken",
+      "BEEF": "Beef",
+      "FISH": "Fish",
+      "VEGETARIAN": "Vegetarian",
+      "VEGAN": "Vegan",
+      "FASTING": "Fasting"
+    },
+    "categories": {
+      "CHICKEN": "Chicken Dishes",
+      "PORK": "Pork Dishes",
+      "BEEF": "Beef Dishes",
+      "MIXED": "Mixed Dishes",
+      "FISH": "Fish Dishes",
+      "FASTING": "Fasting Dishes"
+    },
+    "menuDetails": {
+      "menu1": "500g Portion + Bread + Salad",
+      "menu2": "500g Portion + Bread + Salad + Soup/Stew",
+      "menu3": "500g Portion + Bread + Salad + Soup/Stew + Dessert"
+    },
+    "units": {
+      "rsd": "RSD",
+      "portion": "/ portion"
+    },
+    "filters": {
+      "all": "All Dishes"
+    },
+    "available": "available",
+    "open": "Open",
+    "close": "Close"
   },
   "Checkout": {
     "title": "Your Details",
@@ -39,7 +84,10 @@
     "name": "Full Name",
     "phone": "Phone",
     "email": "Email Address",
-    "note": "Additional Note (Date, Location...)",
+    "portions": "Number of Portions",
+    "address": "Delivery Address",
+    "dateTime": "Date and Time",
+    "note": "Note (Allergies, special requests...)",
     "submit": "Submit Inquiry",
     "disclaimer": "By clicking the button you send an inquiry. We will contact you soon for confirmation.",
     "successTitle": "Thank You!",
@@ -52,5 +100,13 @@
     "brand": "Catering Belgrade",
     "description": "Your partner for unforgettable gastronomic experiences. Professional catering for corporate events and private celebrations.",
     "contact": "Contact"
+  },
+  "Gallery": {
+    "subtitle": "Our Kitchen",
+    "title": "See Our Dishes",
+    "description": "We prepare every dish with love and care, using only the freshest ingredients.",
+    "video": "Video",
+    "viewAll": "View All Images",
+    "dishAlt": "Dish"
   }
 }

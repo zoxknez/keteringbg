@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import MenuSelector from '@/components/MenuSelector'
+import CorporateOffer from '@/components/CorporateOffer'
+import FoodGallery from '@/components/FoodGallery'
 import { getTranslations } from 'next-intl/server'
 
 export const revalidate = 3600 // Revalidate every hour
@@ -60,11 +62,14 @@ export default async function Home() {
               </span>
             </a>
             <a 
-              href="#contact" 
-              className="px-10 py-5 bg-white/5 text-white rounded-full font-semibold text-sm uppercase tracking-widest border border-white/20 hover:bg-white/10 hover:border-amber-500/50 transition-all duration-500"
+              href="#gallery" 
+              className="group px-10 py-5 bg-white/5 text-white rounded-full font-semibold text-sm uppercase tracking-widest border border-white/20 hover:bg-white/10 hover:border-amber-500/50 transition-all duration-500"
             >
-              {t('hero.ctaCorporate')}
+              <span className="flex items-center justify-center gap-3">
+                {t('hero.ctaGallery')}
+              </span>
             </a>
+            <CorporateOffer />
           </div>
 
           {/* Trust Indicators */}
@@ -108,10 +113,24 @@ export default async function Home() {
             <span className="text-xs font-semibold tracking-[0.3em] uppercase text-amber-500">Naši Meniji</span>
             <h2 className="text-5xl md:text-6xl font-serif font-bold text-white">Izaberite Vaš Meni</h2>
             <p className="text-neutral-500 max-w-xl mx-auto">Kreirajte savršen meni za vašu priliku - od elegantnih koktela do raskošnih gozbi</p>
+            
+            <div className="pt-6 flex justify-center">
+              <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-900/20 border border-amber-500/30 rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.1)] animate-pulse">
+                <svg className="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-sm font-bold text-amber-500 uppercase tracking-wider">
+                  {t('hero.notice24h')}
+                </span>
+              </div>
+            </div>
           </div>
           <MenuSelector menus={menus} />
         </div>
       </section>
+
+      {/* Food Gallery Section */}
+      <FoodGallery />
     </div>
   )
 }

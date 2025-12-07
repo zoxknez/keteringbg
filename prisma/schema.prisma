@@ -21,8 +21,22 @@ model Dish {
   description String?
   imageUrl    String?
   category    DishCategory
+  tags        DishTag[]    @default([])
+  isVegetarian Boolean     @default(false)
+  isVegan     Boolean      @default(false)
+  isFasting   Boolean      @default(false) // Posno
   orders      OrderDish[]
   menus       Menu[]
+}
+
+enum DishTag {
+  PORK       // Svinjetina
+  CHICKEN    // Piletina
+  BEEF       // Junetina
+  FISH       // Riba
+  VEGETARIAN // Vegetarijansko
+  VEGAN      // Vegansko
+  FASTING    // Posno
 }
 
 model Order {
@@ -30,8 +44,10 @@ model Order {
   clientName  String
   clientEmail String
   clientPhone String?
+  address     String?
   eventDate   DateTime?
   message     String?
+  portions    Int         @default(1)
   status      OrderStatus @default(PENDING)
   
   menuId      String

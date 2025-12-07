@@ -2,7 +2,7 @@
 
 import { useState, useActionState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Check, ChevronRight, ArrowLeft, Utensils } from 'lucide-react'
+import { Check, ChevronRight, ArrowLeft, Utensils, ChevronDown } from 'lucide-react'
 import { submitOrder } from '@/app/actions'
 import Image from 'next/image'
 
@@ -12,6 +12,10 @@ type Dish = {
   category: string
   imageUrl: string | null
   description: string | null
+  tags?: string[]
+  isVegetarian?: boolean
+  isVegan?: boolean
+  isFasting?: boolean
 }
 
 type Menu = {
@@ -33,19 +37,42 @@ const initialState = {
 
 import { useTranslations } from 'next-intl'
 
+// Emoji za tagove jela
+const tagEmojis: Record<string, string> = {
+  PORK: '🐷',
+  CHICKEN: '🐔',
+  BEEF: '🐄',
+  FISH: '🐟',
+  VEGETARIAN: '🥬',
+  VEGAN: '🌱',
+  FASTING: '✝️'
+}
+
 export default function MenuSelector({ menus }: MenuSelectorProps) {
   const t = useTranslations('Menu')
   const tCheckout = useTranslations('Checkout')
   const [step, setStep] = useState<'menu' | 'dishes' | 'checkout'>('menu')
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null)
   const [selectedDishIds, setSelectedDishIds] = useState<string[]>([])
+  const [activeFilter, setActiveFilter] = useState<string>('ALL')
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([])
   
   const [state, formAction] = useActionState(submitOrder, initialState)
+
+  const toggleCategory = (category: string) => {
+    setExpandedCategories(prev => 
+      prev.includes(category) 
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    )
+  }
 
   const handleMenuSelect = (menu: Menu) => {
     setSelectedMenu(menu)
     setStep('dishes')
     setSelectedDishIds([])
+    setActiveFilter('ALL')
+    setExpandedCategories([])
   }
 
   const toggleDish = (dishId: string) => {
@@ -60,36 +87,69 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
 
   const currentDishes = selectedMenu ? selectedMenu.dishes : []
 
-  const groupedDishes = {
-    APPETIZER: currentDishes.filter(d => d.category === 'APPETIZER'),
-    MAIN: currentDishes.filter(d => d.category === 'MAIN'),
-    DESSERT: currentDishes.filter(d => d.category === 'DESSERT'),
+  // Grupisanje jela po tipu mesa/ishrane
+  const groupedByMeat = {
+    CHICKEN: currentDishes.filter(d => d.tags?.includes('CHICKEN') && !d.tags?.includes('PORK') && !d.tags?.includes('BEEF')),
+    PORK: currentDishes.filter(d => d.tags?.includes('PORK') && !d.tags?.includes('CHICKEN') && !d.tags?.includes('BEEF')),
+    BEEF: currentDishes.filter(d => d.tags?.includes('BEEF') && !d.tags?.includes('PORK') && !d.tags?.includes('CHICKEN')),
+    MIXED: currentDishes.filter(d => {
+      const tags = d.tags || []
+      const meatTags = tags.filter(t => ['PORK', 'CHICKEN', 'BEEF'].includes(t))
+      return meatTags.length > 1
+    }),
+    FISH: currentDishes.filter(d => d.tags?.includes('FISH')),
+    FASTING: currentDishes.filter(d => d.isFasting && !d.tags?.includes('FISH')),
   }
 
-  if (state.success) {
-    return (
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-neutral-900/80 backdrop-blur-xl p-16 rounded-3xl text-center max-w-lg mx-auto border border-white/10"
-      >
-        <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-8">
-          <Check className="w-10 h-10 text-emerald-400" />
-        </div>
-        <h2 className="text-3xl font-serif font-bold text-white mb-4">{tCheckout('successTitle')}</h2>
-        <p className="text-slate-400 text-lg mb-8">{tCheckout('successMessage')}</p>
-        <button 
-          onClick={() => window.location.reload()}
-          className="px-8 py-4 bg-amber-500 text-black hover:bg-amber-400 rounded-full font-semibold text-sm uppercase tracking-widest transition-all duration-300"
-        >
-          {tCheckout('newOrder')}
-        </button>
-      </motion.div>
-    )
+  // Kategorije sa ikonama i bojama
+  const categoryConfig: Record<string, { icon: string; label: string; color: string; bgColor: string }> = {
+    CHICKEN: { icon: '🐔', label: t('categories.CHICKEN'), color: 'text-orange-400', bgColor: 'bg-orange-500/10' },
+    PORK: { icon: '🐷', label: t('categories.PORK'), color: 'text-pink-400', bgColor: 'bg-pink-500/10' },
+    BEEF: { icon: '🐄', label: t('categories.BEEF'), color: 'text-red-400', bgColor: 'bg-red-500/10' },
+    MIXED: { icon: '🍖', label: t('categories.MIXED'), color: 'text-amber-400', bgColor: 'bg-amber-500/10' },
+    FISH: { icon: '🐟', label: t('categories.FISH'), color: 'text-blue-400', bgColor: 'bg-blue-500/10' },
+    FASTING: { icon: '🌱', label: t('categories.FASTING'), color: 'text-emerald-400', bgColor: 'bg-emerald-500/10' },
   }
 
   return (
     <div className="w-full">
+      <AnimatePresence>
+        {state.success && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-neutral-900 border border-white/10 p-8 md:p-12 rounded-3xl text-center max-w-lg w-full shadow-2xl shadow-amber-500/20 relative"
+            >
+              <div className="w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-emerald-500/20">
+                <Check className="w-12 h-12 text-emerald-500" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-4">{tCheckout('successTitle')}</h2>
+              <p className="text-neutral-400 text-lg mb-10 leading-relaxed">{tCheckout('successMessage')}</p>
+              
+              <div className="flex flex-col gap-3">
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="w-full py-4 bg-amber-500 text-black hover:bg-amber-400 rounded-xl font-semibold text-sm uppercase tracking-widest transition-all duration-300 shadow-lg hover:shadow-amber-500/25"
+                >
+                  {tCheckout('newOrder')}
+                </button>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="w-full py-4 bg-white/5 text-white hover:bg-white/10 rounded-xl font-semibold text-sm uppercase tracking-widest transition-all duration-300"
+                >
+                  {t('back')}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence mode="wait">
         {step === 'menu' && (
           <motion.div 
@@ -128,13 +188,15 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                     {menu.name}
                   </h3>
                   
-                  <div className="flex items-end gap-2">
-                    <span className="text-7xl font-serif font-bold text-white">{menu.dishCount}</span>
-                    <span className="text-lg font-medium text-neutral-600 pb-3">{t('dishesChoice')}</span>
+                  {/* Cena */}
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-5xl font-serif font-bold text-amber-500">{menu.price}</span>
+                    <span className="text-lg font-medium text-neutral-500">{t('units.rsd')}</span>
+                    <span className="text-sm text-neutral-600 ml-2">{t('units.portion')}</span>
                   </div>
 
-                  <p className="text-neutral-500 leading-relaxed">
-                    {t('description')}
+                  <p className="text-neutral-500 leading-relaxed text-sm">
+                    {t(`menuDetails.menu${index + 1}`)}
                   </p>
 
                   <div className="pt-4">
@@ -202,59 +264,153 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
               </div>
             </div>
 
-            {/* Dishes Grid */}
-            <div className="space-y-16">
-              {Object.entries(groupedDishes).map(([category, categoryDishes]) => {
-                if (categoryDishes.length === 0) return null
+            {/* Filter Tabs */}
+            <div className="flex flex-wrap justify-center gap-2 pb-4">
+              <button
+                onClick={() => setActiveFilter('ALL')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                  activeFilter === 'ALL' 
+                    ? 'bg-amber-500 text-black' 
+                    : 'bg-white/5 text-neutral-400 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                🍽️ {t('filters.all')}
+              </button>
+              {Object.entries(categoryConfig).map(([key, config]) => {
+                const count = groupedByMeat[key as keyof typeof groupedByMeat]?.length || 0
+                if (count === 0) return null
                 return (
-                <div key={category} className="space-y-8">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center">
-                      <Utensils className="w-5 h-5 text-amber-400" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-serif font-bold text-white">
-                        {category === 'APPETIZER' ? t('appetizers') : category === 'MAIN' ? t('mains') : t('desserts')}
-                      </h3>
-                      <p className="text-neutral-600 text-sm">{t('chooseDishes')}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {categoryDishes.map((dish) => (
-                      <motion.div 
-                        layout
-                        key={dish.id}
-                        onClick={() => toggleDish(dish.id)}
-                        whileHover={{ y: -5 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`group cursor-pointer bg-neutral-900/60 backdrop-blur rounded-2xl overflow-hidden transition-all duration-300 border-2 ${selectedDishIds.includes(dish.id) ? 'border-amber-500' : 'border-white/5 hover:border-white/10'}`}
-                      >
-                        <div className="relative aspect-[4/3] overflow-hidden">
-                          <Image 
-                            src={dish.imageUrl || ''} 
-                            alt={dish.name}
-                            fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-110"
-                          />
-                          
-                          {/* Selection Badge */}
-                          <div className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${selectedDishIds.includes(dish.id) ? 'bg-amber-500 scale-100' : 'bg-black/80 scale-0 group-hover:scale-100'}`}>
-                            <Check className={`w-4 h-4 ${selectedDishIds.includes(dish.id) ? 'text-black' : 'text-neutral-400'}`} />
-                          </div>
-                        </div>
+                  <button
+                    key={key}
+                    onClick={() => setActiveFilter(key)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                      activeFilter === key 
+                        ? `${config.bgColor} ${config.color} ring-2 ring-current` 
+                        : 'bg-white/5 text-neutral-400 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    <span>{config.icon}</span>
+                    <span className="hidden sm:inline">{config.label}</span>
+                    <span className="text-xs opacity-60">({count})</span>
+                  </button>
+                )
+              })}
+            </div>
 
-                        <div className="p-4">
-                          <h4 className={`font-bold text-lg transition-colors duration-300 ${selectedDishIds.includes(dish.id) ? 'text-amber-400' : 'text-white'}`}>
-                            {dish.name}
-                          </h4>
-                          <p className="text-sm text-neutral-600 mt-1 line-clamp-2">
-                            {dish.description || t('dishDescription')}
-                          </p>
+            {/* Dishes Grid */}
+            <div className="space-y-4">
+              {Object.entries(groupedByMeat).map(([category, categoryDishes]) => {
+                if (categoryDishes.length === 0) return null
+                if (activeFilter !== 'ALL' && activeFilter !== category) return null
+                const config = categoryConfig[category]
+                const isExpanded = expandedCategories.includes(category)
+                const selectedInCategory = categoryDishes.filter(d => selectedDishIds.includes(d.id)).length
+                
+                return (
+                <div key={category} className="space-y-4">
+                  {/* Category Header - Clickable */}
+                  <button 
+                    onClick={() => toggleCategory(category)}
+                    className={`w-full flex items-center gap-4 p-4 rounded-2xl ${config.bgColor} border border-white/5 hover:border-white/20 transition-all duration-300 cursor-pointer group`}
+                  >
+                    <div className={`w-14 h-14 rounded-xl ${config.bgColor} flex items-center justify-center text-3xl transition-transform duration-300 ${isExpanded ? 'scale-110' : ''}`}>
+                      {config.icon}
+                    </div>
+                    <div className="flex-1 text-left">
+                      <h3 className={`text-xl font-serif font-bold ${config.color} flex items-center gap-2`}>
+                        {config.label}
+                        {selectedInCategory > 0 && (
+                          <span className="px-2 py-0.5 bg-amber-500 text-black text-xs font-bold rounded-full">
+                            {selectedInCategory} {t('selected')}
+                          </span>
+                        )}
+                      </h3>
+                      <p className="text-neutral-500 text-sm">{categoryDishes.length} {t('dishes')} {t('available')}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="hidden sm:block text-neutral-600 text-sm">
+                        {isExpanded ? t('close') : t('open')}
+                      </span>
+                      <div className={`w-10 h-10 rounded-full ${isExpanded ? 'bg-amber-500 text-black' : 'bg-white/10 text-white'} flex items-center justify-center transition-all duration-300`}>
+                        <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+                      </div>
+                    </div>
+                  </button>
+                  
+                  {/* Collapsible Content */}
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="overflow-hidden"
+                      >
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-2">
+                          {categoryDishes.map((dish) => (
+                            <motion.div 
+                              layout
+                              initial={{ opacity: 0, scale: 0.9 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ duration: 0.2 }}
+                              key={dish.id}
+                              onClick={() => toggleDish(dish.id)}
+                              whileHover={{ y: -5 }}
+                              whileTap={{ scale: 0.98 }}
+                              className={`group cursor-pointer bg-neutral-900/60 backdrop-blur rounded-2xl overflow-hidden transition-all duration-300 border-2 ${selectedDishIds.includes(dish.id) ? 'border-amber-500' : 'border-white/5 hover:border-white/10'}`}
+                            >
+                              <div className="relative aspect-[4/3] overflow-hidden">
+                                <Image 
+                                  src={dish.imageUrl || ''} 
+                                  alt={dish.name}
+                                  fill
+                                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
+                                
+                                {/* Tags */}
+                                {dish.tags && dish.tags.length > 0 && (
+                                  <div className="absolute top-3 left-3 flex flex-wrap gap-1">
+                                    {dish.tags.map((tag) => (
+                                      <span 
+                                        key={tag} 
+                                        className="px-2 py-1 bg-black/70 backdrop-blur-sm rounded-full text-xs font-medium text-white flex items-center gap-1"
+                                        title={t(`tags.${tag}`)}
+                                      >
+                                        <span>{tagEmojis[tag] || '🍽️'}</span>
+                                      </span>
+                                    ))}
+                                    {dish.isFasting && !dish.tags.includes('FASTING') && (
+                                      <span 
+                                        className="px-2 py-1 bg-emerald-600/80 backdrop-blur-sm rounded-full text-xs font-medium text-white flex items-center gap-1"
+                                        title={t('tags.FASTING')}
+                                      >
+                                        <span>✝️</span>
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                                
+                                {/* Selection Badge */}
+                                <div className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${selectedDishIds.includes(dish.id) ? 'bg-amber-500 scale-100' : 'bg-black/80 scale-0 group-hover:scale-100'}`}>
+                                  <Check className={`w-4 h-4 ${selectedDishIds.includes(dish.id) ? 'text-black' : 'text-neutral-400'}`} />
+                                </div>
+                              </div>
+
+                              <div className="p-4">
+                                <h4 className={`font-bold text-lg transition-colors duration-300 ${selectedDishIds.includes(dish.id) ? 'text-amber-400' : 'text-white'}`}>
+                                  {dish.name}
+                                </h4>
+                                <p className="text-sm text-neutral-600 mt-1 line-clamp-2">
+                                  {dish.description || t('dishDescription')}
+                                </p>
+                              </div>
+                            </motion.div>
+                          ))}
                         </div>
                       </motion.div>
-                    ))}
-                  </div>
+                    )}
+                  </AnimatePresence>
                 </div>
               )})}
             </div>
@@ -315,15 +471,54 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                   </div>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-semibold text-neutral-300 mb-2">{tCheckout('email')}</label>
-                  <input 
-                    required 
-                    name="clientEmail" 
-                    type="email" 
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700"
-                    placeholder="vas@email.com"
-                  />
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-neutral-300 mb-2">{tCheckout('email')}</label>
+                    <input 
+                      required 
+                      name="clientEmail" 
+                      type="email" 
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700"
+                      placeholder="vas@email.com"
+                    />
+                  </div>
+                  <div className="bg-amber-500/10 border border-amber-500/50 rounded-2xl overflow-hidden relative group hover:bg-amber-500/20 transition-colors duration-300">
+                    <label className="block text-xs font-bold text-amber-500 uppercase tracking-widest mb-0 px-4 pt-3">{tCheckout('portions')}</label>
+                    <input 
+                      required 
+                      name="portions" 
+                      type="number" 
+                      min="1"
+                      defaultValue="1"
+                      className="w-full bg-transparent border-none px-4 pb-4 pt-1 text-white text-3xl font-bold focus:ring-0 focus:outline-none placeholder:text-neutral-700 appearance-none"
+                    />
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <Utensils className="w-6 h-6 text-amber-500/50 group-hover:text-amber-500 transition-colors" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-neutral-300 mb-2">{tCheckout('address')}</label>
+                    <input 
+                      required 
+                      name="address" 
+                      type="text" 
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700"
+                      placeholder="Ulica i broj, Grad"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-neutral-300 mb-2">{tCheckout('dateTime')}</label>
+                    <input 
+                      required 
+                      name="eventDate" 
+                      type="datetime-local" 
+                      min={new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 16)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700 [color-scheme:dark]"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -332,7 +527,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                     name="message" 
                     rows={4} 
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700 resize-none"
-                    placeholder="Datum događaja, broj gostiju, posebne želje..."
+                    placeholder="..."
                   ></textarea>
                 </div>
 

@@ -2,13 +2,25 @@
 
 import { useLocale } from 'next-intl'
 import { useRouter, usePathname } from 'next/navigation'
-import { useTransition } from 'react'
+import { useTransition, useState } from 'react'
+import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 
 export default function LanguageSwitcher() {
   const locale = useLocale()
   const router = useRouter()
   const pathname = usePathname()
   const [isPending, startTransition] = useTransition()
+  const { scrollY } = useScroll()
+  const [hidden, setHidden] = useState(false)
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const previous = scrollY.getPrevious() || 0
+    if (latest > previous && latest > 150) {
+      setHidden(true)
+    } else {
+      setHidden(false)
+    }
+  })
 
   const onSelectChange = (nextLocale: string) => {
     startTransition(() => {
@@ -27,7 +39,15 @@ export default function LanguageSwitcher() {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50">
+    <motion.header 
+      variants={{
+        visible: { y: 0 },
+        hidden: { y: -100 },
+      }}
+      animate={hidden ? "hidden" : "visible"}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
+      className="fixed top-0 left-0 right-0 z-50"
+    >
       {/* Mobile - Full width language bar */}
       <div className="md:hidden w-full bg-black/90 backdrop-blur-lg border-b border-white/10">
         <div className="flex justify-center gap-2 px-4 py-3">
@@ -67,6 +87,6 @@ export default function LanguageSwitcher() {
           </button>
         ))}
       </div>
-    </header>
+    </motion.header>
   )
 }
