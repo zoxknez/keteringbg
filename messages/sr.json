@@ -11,6 +11,12 @@
       "ctaGallery": "Pogledajte Naša Jela",
       "notice24h": "* Porudžbine je potrebno izvršiti minimum 24h unapred",
       "ctaCorporate": "Personalizacija Ponude Za Firme",
+      "ctaContact": "Kontakt",
+      "contactModal": {
+        "title": "Kontaktirajte Nas",
+        "description": "Izaberite način komunikacije:",
+        "call": "Pozovite Nas"
+      },
       "corporateModal": {
         "title": "Personalizovana Ponuda za Firme",
         "description": "Svaki dogovor je moguć! Nudimo posebne benefite i popuste za dugoročne ugovore i redovne porudžbine.",

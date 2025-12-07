@@ -11,6 +11,12 @@
       "ctaGallery": "See Our Dishes",
       "notice24h": "* Orders must be placed at least 24h in advance",
       "ctaCorporate": "Corporate Offer Personalization",
+      "ctaContact": "Contact",
+      "contactModal": {
+        "title": "Contact Us",
+        "description": "Choose your preferred way to reach us:",
+        "call": "Call Us"
+      },
       "corporateModal": {
         "title": "Personalized Corporate Offer",
         "description": "Every agreement is possible! We offer special benefits and discounts for long-term contracts and regular orders.",

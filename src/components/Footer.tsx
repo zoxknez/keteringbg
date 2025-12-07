@@ -35,11 +35,11 @@ export default function Footer() {
           <div className="space-y-6">
             <h4 className="text-sm font-bold uppercase tracking-widest text-white">{t('contact')}</h4>
             <div className="space-y-4">
-              <a href="tel:0628368099" className="flex items-center gap-3 group">
+              <a href="tel:+381637044428" className="flex items-center gap-3 group">
                 <div className="w-10 h-10 rounded-full bg-neutral-800 group-hover:bg-amber-500 flex items-center justify-center transition-colors duration-300">
                   <Phone className="w-4 h-4" />
                 </div>
-                <span className="group-hover:text-white transition-colors">062 836 8099</span>
+                <span className="group-hover:text-white transition-colors">063 704 4428</span>
               </a>
               <a href="mailto:spalevic.dragan@gmail.com" className="flex items-center gap-3 group">
                 <div className="w-10 h-10 rounded-full bg-neutral-800 group-hover:bg-amber-500 flex items-center justify-center transition-colors duration-300">

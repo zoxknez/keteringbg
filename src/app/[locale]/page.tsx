@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import MenuSelector from '@/components/MenuSelector'
 import CorporateOffer from '@/components/CorporateOffer'
+import ContactButton from '@/components/ContactButton'
 import FoodGallery from '@/components/FoodGallery'
 import { getTranslations } from 'next-intl/server'
 
@@ -70,6 +71,7 @@ export default async function Home() {
               </span>
             </a>
             <CorporateOffer />
+            <ContactButton />
           </div>
 
           {/* Trust Indicators */}
