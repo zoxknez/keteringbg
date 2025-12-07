@@ -9,7 +9,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    // Fallback to a dummy URL during build if DATABASE_URL is not present
-    url: process.env.DATABASE_URL ?? "postgresql://postgres:password@localhost:5432/bauk",
+    url: process.env.DATABASE_URL,
   },
 });
