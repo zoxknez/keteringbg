@@ -16,6 +16,7 @@ export async function submitOrder(prevState: any, formData: FormData) {
   const portions = parseInt(formData.get('portions') as string) || 1
   const menuId = formData.get('menuId') as string
   const selectedDishIds = JSON.parse(formData.get('selectedDishIds') as string) as string[]
+  const locale = formData.get('locale') as string || 'sr'
 
   if (!clientName || !clientEmail || !menuId || selectedDishIds.length === 0) {
     return { success: false, message: 'Molimo popunite sva polja i izaberite jela.' }
@@ -75,6 +76,14 @@ export async function submitOrder(prevState: any, formData: FormData) {
       return colors[cat] || '#6b7280'
     }
 
+    // Locale labels for email
+    const localeLabels: Record<string, { flag: string; name: string }> = {
+      'sr': { flag: '🇷🇸', name: 'Srpski' },
+      'en': { flag: '🇬🇧', name: 'English' },
+      'ru': { flag: '🇷🇺', name: 'Русский' }
+    }
+    const clientLocale = localeLabels[locale] || localeLabels['sr']
+
     // Group dishes by category
     const dishesByCategory = order.selectedDishes.reduce((acc, od) => {
       const cat = od.dish.category
@@ -103,6 +112,10 @@ export async function submitOrder(prevState: any, formData: FormData) {
                 <tr>
                   <td style="padding: 10px 0; color: #6b7280; width: 130px; vertical-align: top;"><strong>Ime i Prezime:</strong></td>
                   <td style="padding: 10px 0; color: #1f2937; font-size: 16px; font-weight: 600;">${clientName}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 0; color: #6b7280;"><strong>🌐 Jezik sajta:</strong></td>
+                  <td style="padding: 10px 0; color: #1f2937;">${clientLocale.flag} ${clientLocale.name}</td>
                 </tr>
                 <tr>
                   <td style="padding: 10px 0; color: #6b7280;"><strong>📧 Email:</strong></td>

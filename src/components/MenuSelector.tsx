@@ -35,7 +35,7 @@ const initialState = {
   message: '',
 }
 
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 
 // Emoji za tagove jela
 const tagEmojis: Record<string, string> = {
@@ -51,6 +51,7 @@ const tagEmojis: Record<string, string> = {
 export default function MenuSelector({ menus }: MenuSelectorProps) {
   const t = useTranslations('Menu')
   const tCheckout = useTranslations('Checkout')
+  const locale = useLocale()
   const [step, setStep] = useState<'menu' | 'dishes' | 'checkout'>('menu')
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null)
   const [selectedDishIds, setSelectedDishIds] = useState<string[]>([])
@@ -447,6 +448,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
               <form action={formAction} className="space-y-6">
                 <input type="hidden" name="menuId" value={selectedMenu?.id} />
                 <input type="hidden" name="selectedDishIds" value={JSON.stringify(selectedDishIds)} />
+                <input type="hidden" name="locale" value={locale} />
                 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
