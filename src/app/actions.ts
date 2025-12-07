@@ -1,182 +1,232 @@
-'use server'
+'use server';
 
-import { prisma } from '@/lib/prisma'
-import { Resend } from 'resend'
+import { prisma } from '@/lib/prisma';
+import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+interface OrderMenuItem {
+  menuId: string;
+  menuName: string;
+  portions: number;
+  pricePerPortion: number;
+  totalPrice: number;
+  dishCount: number;
+  selectedDishIds: string[];
+}
 
-export async function submitOrder(prevState: any, formData: FormData) {
-  const clientName = formData.get('clientName') as string
-  const clientEmail = formData.get('clientEmail') as string
-  const clientPhone = formData.get('clientPhone') as string
-  const address = formData.get('address') as string
-  const eventDateStr = formData.get('eventDate') as string
-  const eventDate = eventDateStr ? new Date(eventDateStr) : null
-  const message = formData.get('message') as string
-  const portions = parseInt(formData.get('portions') as string) || 1
-  const menuId = formData.get('menuId') as string
-  const selectedDishIds = JSON.parse(formData.get('selectedDishIds') as string) as string[]
-  const locale = formData.get('locale') as string || 'sr'
+interface OrderData {
+  orders: OrderMenuItem[];
+  totalPrice: number;
+  totalPortions: number;
+}
 
-  if (!clientName || !clientEmail || !menuId || selectedDishIds.length === 0) {
-    return { success: false, message: 'Molimo popunite sva polja i izaberite jela.' }
-  }
+const resend = new Resend(process.env.RESEND_API_KEY);
 
+const categoryTranslations: Record<string, Record<string, string>> = {
+  sr: {
+    'SALAD': 'Salata',
+    'MAIN': 'Glavno jelo',
+    'SIDE': 'Prilog',
+    'DESSERT': 'Dezert',
+  },
+  en: {
+    'SALAD': 'Salad',
+    'MAIN': 'Main course',
+    'SIDE': 'Side dish',
+    'DESSERT': 'Dessert',
+  },
+  ru: {
+    'SALAD': 'Салат',
+    'MAIN': 'Основное блюдо',
+    'SIDE': 'Гарнир',
+    'DESSERT': 'Десерт',
+  },
+};
+
+const localeLabels: Record<string, string> = {
+  sr: '🇷🇸 Srpski',
+  en: '🇬🇧 English',
+  ru: '🇷🇺 Русский',
+};
+
+export async function submitOrder(
+  _prevState: { success: boolean; message: string },
+  formData: FormData
+): Promise<{ success: boolean; message: string }> {
   try {
-    // Save to DB
-    const order = await prisma.order.create({
-      data: {
-        clientName,
-        clientEmail,
-        clientPhone,
-        address,
-        eventDate,
-        message,
-        portions,
-        menuId,
-        selectedDishes: {
-          create: selectedDishIds.map(dishId => ({
-            dish: { connect: { id: dishId } }
-          }))
+    // Parse order data
+    const orderDataJson = formData.get('orderData') as string;
+    const orderData: OrderData = JSON.parse(orderDataJson);
+    
+    // Customer details
+    const customerName = formData.get('clientName') as string;
+    const customerPhone = formData.get('clientPhone') as string;
+    const customerEmail = formData.get('clientEmail') as string;
+    const address = formData.get('address') as string;
+    const eventDate = formData.get('eventDate') as string;
+    const message = formData.get('message') as string || '';
+    const locale = formData.get('locale') as string || 'sr';
+
+    console.log('=== ORDER SUBMISSION START ===');
+    console.log('Customer:', customerName, customerPhone, customerEmail);
+    console.log('Address:', address);
+    console.log('Event Date:', eventDate);
+    console.log('Message:', message);
+    console.log('Locale:', locale);
+    console.log('Order Data:', JSON.stringify(orderData, null, 2));
+
+    const { orders, totalPrice, totalPortions } = orderData;
+
+    // Get category translations for this locale
+    const catTrans = categoryTranslations[locale] || categoryTranslations['sr'];
+    const localeLabel = localeLabels[locale] || locale;
+
+    // Format event date
+    const eventDateFormatted = new Date(eventDate).toLocaleString('sr-RS', {
+      dateStyle: 'full',
+      timeStyle: 'short'
+    });
+
+    // Build email content for each menu
+    let menuSections = '';
+    
+    for (const order of orders) {
+      // Fetch dishes with categories for this menu
+      const dishes = await prisma.dish.findMany({
+        where: { id: { in: order.selectedDishIds } },
+        select: {
+          id: true,
+          name: true,
+          category: true,
         }
-      },
-      include: {
-        menu: true,
-        selectedDishes: {
-          include: {
-            dish: true
-          }
+      });
+
+      // Group dishes by category
+      const dishesByCategory: Record<string, string[]> = {};
+      dishes.forEach((dish: { id: string; name: string; category: string }) => {
+        const category = dish.category;
+        if (!dishesByCategory[category]) {
+          dishesByCategory[category] = [];
         }
-      }
-    })
+        dishesByCategory[category].push(dish.name);
+      });
 
-    // Category translation helper
-    const categoryLabels: Record<string, string> = {
-      'MAIN': 'Glavno jelo',
-      'SALAD': 'Salata',
-      'APPETIZER': 'Predjelo',
-      'DESSERT': 'Desert',
-      'SOUP': 'Supa',
-      'SIDE': 'Prilog',
-      'DRINK': 'Piće'
-    }
-
-    const getCategoryLabel = (cat: string) => categoryLabels[cat] || cat
-
-    const getCategoryColor = (cat: string) => {
-      const colors: Record<string, string> = {
-        'MAIN': '#d97706',
-        'SALAD': '#22c55e',
-        'APPETIZER': '#3b82f6',
-        'DESSERT': '#ec4899',
-        'SOUP': '#f97316',
-        'SIDE': '#8b5cf6',
-        'DRINK': '#06b6d4'
-      }
-      return colors[cat] || '#6b7280'
-    }
-
-    // Locale labels for email
-    const localeLabels: Record<string, { flag: string; name: string }> = {
-      'sr': { flag: '🇷🇸', name: 'Srpski' },
-      'en': { flag: '🇬🇧', name: 'English' },
-      'ru': { flag: '🇷🇺', name: 'Русский' }
-    }
-    const clientLocale = localeLabels[locale] || localeLabels['sr']
-
-    // Group dishes by category
-    const dishesByCategory = order.selectedDishes.reduce((acc, od) => {
-      const cat = od.dish.category
-      if (!acc[cat]) acc[cat] = []
-      acc[cat].push(od.dish)
-      return acc
-    }, {} as Record<string, typeof order.selectedDishes[0]['dish'][]>)
-
-    // Send Email
-    try {
-      console.log('Attempting to send email with API key:', process.env.RESEND_API_KEY?.substring(0, 10) + '...')
-      const emailResult = await resend.emails.send({
-        from: 'Ketering Beograd <onboarding@resend.dev>',
-        to: ['spalevic.dragan@gmail.com'], // Owner email
-        replyTo: clientEmail, // Allows direct reply to customer
-        subject: `🍽️ Nova Porudžbina: ${clientName} - ${order.menu.name}`,
-        html: `
-          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e5e5; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 30px; text-align: center;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 28px; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">🍽️ Nova Porudžbina</h1>
-              <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 14px;">${new Date().toLocaleDateString('sr-RS', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+      // Create dishes list by category
+      let categoryBlocks = '';
+      const categoryOrder = ['SALAD', 'MAIN', 'SIDE', 'DESSERT', 'APPETIZER'];
+      categoryOrder.forEach(cat => {
+        if (dishesByCategory[cat] && dishesByCategory[cat].length > 0) {
+          const catName = catTrans[cat] || cat;
+          categoryBlocks += `
+            <div style="margin-bottom: 8px;">
+              <strong style="color: #4a5568;">${catName}:</strong>
+              <span style="color: #2d3748;">${dishesByCategory[cat].join(', ')}</span>
             </div>
-            
-            <div style="padding: 25px; background-color: #ffffff;">
-              <h2 style="color: #1f2937; border-bottom: 3px solid #f59e0b; padding-bottom: 10px; margin-top: 0; font-size: 18px;">👤 Podaci o Klijentu</h2>
-              <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
-                <tr>
-                  <td style="padding: 10px 0; color: #6b7280; width: 130px; vertical-align: top;"><strong>Ime i Prezime:</strong></td>
-                  <td style="padding: 10px 0; color: #1f2937; font-size: 16px; font-weight: 600;">${clientName}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 0; color: #6b7280;"><strong>🌐 Jezik sajta:</strong></td>
-                  <td style="padding: 10px 0; color: #1f2937;">${clientLocale.flag} ${clientLocale.name}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 0; color: #6b7280;"><strong>📧 Email:</strong></td>
-                  <td style="padding: 10px 0;"><a href="mailto:${clientEmail}" style="color: #d97706; text-decoration: none;">${clientEmail}</a></td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 0; color: #6b7280;"><strong>📱 Telefon:</strong></td>
-                  <td style="padding: 10px 0;"><a href="tel:${clientPhone}" style="color: #d97706; text-decoration: none; font-weight: 500;">${clientPhone}</a></td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 0; color: #6b7280;"><strong>📍 Adresa:</strong></td>
-                  <td style="padding: 10px 0; color: #1f2937;">${address || '-'}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 0; color: #6b7280;"><strong>📅 Datum:</strong></td>
-                  <td style="padding: 10px 0; color: #1f2937; font-weight: 500;">${eventDate ? eventDate.toLocaleDateString('sr-RS', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}</td>
-                </tr>
-              </table>
-
-              <h2 style="color: #1f2937; border-bottom: 3px solid #f59e0b; padding-bottom: 10px;">📋 Detalji Porudžbine</h2>
-              <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; border-radius: 8px; margin-bottom: 25px;">
-                <p style="margin: 5px 0; font-size: 20px;"><strong>Meni:</strong> <span style="color: #92400e; font-weight: 700;">${order.menu.name}</span></p>
-                <p style="margin: 10px 0 5px 0; font-size: 16px;"><strong>Broj Porcija:</strong> <span style="background-color: #d97706; color: white; padding: 2px 10px; border-radius: 12px; font-weight: 600;">${portions}</span></p>
-                ${message ? `<div style="margin-top: 15px; padding: 12px; background-color: rgba(255,255,255,0.7); border-radius: 6px; border-left: 4px solid #d97706;"><strong style="color: #92400e;">💬 Napomena:</strong><br/><span style="color: #1f2937;">${message}</span></div>` : ''}
-              </div>
-
-              <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 16px;">🍴 Izabrana Jela (${order.selectedDishes.length}):</h3>
-              ${Object.entries(dishesByCategory).map(([category, dishes]) => `
-                <div style="margin-bottom: 15px;">
-                  <div style="background-color: ${getCategoryColor(category)}; color: white; padding: 8px 12px; border-radius: 6px 6px 0 0; font-weight: 600; font-size: 14px;">
-                    ${getCategoryLabel(category)} (${dishes.length})
-                  </div>
-                  <ul style="list-style-type: none; padding: 0; margin: 0; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 6px 6px;">
-                    ${dishes.map((dish, idx) => `
-                      <li style="padding: 12px 15px; border-bottom: ${idx < dishes.length - 1 ? '1px solid #e5e7eb' : 'none'}; display: flex; align-items: center;">
-                        <span style="font-weight: 500; color: #1f2937;">• ${dish.name}</span>
-                      </li>
-                    `).join('')}
-                  </ul>
-                </div>
-              `).join('')}
-            </div>
-            
-            <div style="background-color: #1f2937; padding: 20px; text-align: center;">
-              <p style="color: #9ca3af; font-size: 12px; margin: 0;">Ova poruka je automatski generisana sa vašeg sajta.</p>
-              <p style="color: #6b7280; font-size: 11px; margin: 8px 0 0 0;">Možete direktno odgovoriti na ovaj email da kontaktirate klijenta.</p>
-            </div>
+          `;
+        }
+      });
+      
+      menuSections += `
+        <div style="background-color: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #3b82f6;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="margin: 0; color: #1e40af; font-size: 18px;">${order.menuName}</h3>
+            <span style="background-color: #3b82f6; color: white; padding: 4px 12px; border-radius: 20px; font-size: 14px;">
+              x${order.portions}
+            </span>
           </div>
-        `
-      })
-      console.log('Email sent successfully:', emailResult)
-    } catch (emailError: any) {
-      console.error('Failed to send email:', emailError?.message || emailError)
-      console.error('Full error:', JSON.stringify(emailError, null, 2))
-      // Don't fail the request if email fails, just log it
+          ${categoryBlocks}
+          <div style="border-top: 1px solid #e2e8f0; margin-top: 12px; padding-top: 12px; text-align: right;">
+            <span style="color: #64748b;">Cena po meniju: ${order.pricePerPortion} RSD</span>
+            <br/>
+            <strong style="color: #1e40af; font-size: 16px;">Ukupno: ${order.totalPrice.toLocaleString()} RSD</strong>
+          </div>
+        </div>
+      `;
     }
 
-    return { success: true, message: 'Vaša porudžbina je uspešno poslata!' }
+    // Email HTML content
+    const emailHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Nova Porudžbina - BAUK</title>
+      </head>
+      <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f1f5f9;">
+        <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+          <h1 style="color: #ffffff; margin: 0; font-size: 28px;">🍽️ Nova Porudžbina</h1>
+          <p style="color: #93c5fd; margin: 10px 0 0 0; font-size: 14px;">BAUK Ketering</p>
+        </div>
+        
+        <div style="background-color: #ffffff; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          
+          <div style="background-color: #fef3c7; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; border-left: 4px solid #f59e0b;">
+            <span style="color: #92400e; font-weight: 500;">🌐 Jezik korišćen: ${localeLabel}</span>
+          </div>
+          
+          <div style="background-color: #f0fdf4; border-radius: 8px; padding: 16px; margin-bottom: 20px; border-left: 4px solid #22c55e;">
+            <h2 style="margin: 0 0 12px 0; color: #166534; font-size: 16px;">👤 Podaci o kupcu</h2>
+            <p style="margin: 0; color: #2d3748;"><strong>Ime:</strong> ${customerName}</p>
+            <p style="margin: 8px 0 0 0; color: #2d3748;"><strong>Telefon:</strong> <a href="tel:${customerPhone}" style="color: #166534; text-decoration: none;">${customerPhone}</a></p>
+            <p style="margin: 8px 0 0 0; color: #2d3748;"><strong>Email:</strong> <a href="mailto:${customerEmail}" style="color: #166534; text-decoration: none;">${customerEmail}</a></p>
+          </div>
+
+          <div style="background-color: #eff6ff; border-radius: 8px; padding: 16px; margin-bottom: 20px; border-left: 4px solid #3b82f6;">
+            <h2 style="margin: 0 0 12px 0; color: #1e40af; font-size: 16px;">📍 Detalji isporuke</h2>
+            <p style="margin: 0; color: #2d3748;"><strong>Adresa:</strong> ${address}</p>
+            <p style="margin: 8px 0 0 0; color: #2d3748;"><strong>Datum i vreme:</strong> ${eventDateFormatted}</p>
+            ${message ? `<p style="margin: 8px 0 0 0; color: #2d3748;"><strong>Napomena:</strong> ${message}</p>` : ''}
+          </div>
+
+          <h2 style="color: #1e40af; border-bottom: 2px solid #3b82f6; padding-bottom: 8px; margin-bottom: 16px;">📋 Poručeni meniji</h2>
+          
+          ${menuSections}
+
+          <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); border-radius: 8px; padding: 20px; margin-top: 20px; text-align: center;">
+            <span style="color: #93c5fd; font-size: 14px;">UKUPNO ZA PLAĆANJE</span>
+            <div style="color: #ffffff; font-size: 32px; font-weight: bold; margin-top: 8px;">
+              ${totalPrice.toLocaleString()} RSD
+            </div>
+            <span style="color: #93c5fd; font-size: 12px;">(${orders.length} ${orders.length === 1 ? 'meni' : orders.length < 5 ? 'menija' : 'menija'}, ${totalPortions} obroka)</span>
+          </div>
+          
+          <div style="text-align: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; font-size: 12px; margin: 0;">
+              Ova porudžbina je primljena putem BAUK sajta<br/>
+              ${new Date().toLocaleString('sr-RS', { dateStyle: 'full', timeStyle: 'short' })}
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Send email
+    console.log('=== SENDING EMAIL ===');
+    console.log('API Key exists:', !!process.env.RESEND_API_KEY);
+    console.log('API Key prefix:', process.env.RESEND_API_KEY?.substring(0, 10));
+    
+    const { data, error } = await resend.emails.send({
+      from: 'BAUK Porudžbine <onboarding@resend.dev>',
+      to: ['spalevic.dragan@gmail.com'],
+      subject: `Nova Porudžbina - ${customerName} (${totalPortions} obroka, ${totalPrice.toLocaleString()} RSD)`,
+      html: emailHtml,
+    });
+
+    console.log('=== EMAIL RESPONSE ===');
+    console.log('Data:', JSON.stringify(data, null, 2));
+    console.log('Error:', JSON.stringify(error, null, 2));
+
+    if (error) {
+      console.error('Resend error:', error);
+      return { success: false, message: 'Email failed: ' + error.message };
+    }
+
+    console.log('Email sent successfully:', data);
+    console.log('=== ORDER SUBMISSION END ===');
+
+    return { success: true, message: 'Order submitted successfully!' };
   } catch (error) {
-    console.error('Order submission error:', error)
-    return { success: false, message: 'Došlo je do greške prilikom slanja porudžbine.' }
+    console.error('Order submission error:', error);
+    return { success: false, message: 'Failed to submit order. Please try again.' };
   }
 }

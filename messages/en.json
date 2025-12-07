@@ -87,6 +87,8 @@
   "Checkout": {
     "title": "Your Details",
     "changeDishes": "Change Dishes",
+    "orderSummary": "Order Summary",
+    "total": "Total",
     "name": "Full Name",
     "phone": "Phone",
     "email": "Email Address",
