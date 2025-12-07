@@ -19,7 +19,7 @@ export default async function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center relative px-6 pt-20 md:pt-0">
+      <section className="min-h-screen flex items-center justify-center relative px-6 pt-20 pb-40 md:pt-0 md:pb-0">
         <div className="max-w-6xl mx-auto text-center space-y-12 animate-fade-in-up">
           
           {/* Badge */}
@@ -91,7 +91,7 @@ export default async function Home() {
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
           <div className="flex flex-col items-center gap-2 text-neutral-600">
             <span className="text-xs tracking-widest uppercase">{t('hero.scroll')}</span>
             <div className="w-6 h-10 rounded-full border-2 border-neutral-700 flex items-start justify-center p-2">
