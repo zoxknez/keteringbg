@@ -1,0 +1,56 @@
+{
+  "Index": {
+    "title": "Premium Catering Belgrade",
+    "subtitle": "Exclusive gastronomic delight for your celebrations.",
+    "hero": {
+      "badge": "Premium Catering · Belgrade",
+      "titleLine1": "Perfect",
+      "titleLine2": "Taste",
+      "subtitle": "Exclusive catering for <bold>corporate events</bold> and <bold>unforgettable celebrations</bold>",
+      "ctaMenu": "Select Menu",
+      "ctaCorporate": "For Companies",
+      "scroll": "Scroll"
+    },
+    "trust": {
+      "events": "500+ Events",
+      "experience": "10+ Years Experience",
+      "clients": "100% Satisfied Clients"
+    }
+  },
+  "Menu": {
+    "dishes": "Dishes",
+    "description": "Perfect choice for small and medium celebrations. Includes appetizer, main course, and dessert.",
+    "select": "Select Menu",
+    "selected": "Selected",
+    "back": "Back",
+    "next": "Next",
+    "appetizers": "Appetizers",
+    "mains": "Main Courses",
+    "desserts": "Desserts",
+    "dishesChoice": "dishes of your choice",
+    "chooseDishes": "Choose the dishes you want",
+    "dishDescription": "Exclusively prepared from the freshest ingredients.",
+    "menuLabel": "Menu",
+    "popular": "Popular"
+  },
+  "Checkout": {
+    "title": "Your Details",
+    "changeDishes": "Change Dishes",
+    "name": "Full Name",
+    "phone": "Phone",
+    "email": "Email Address",
+    "note": "Additional Note (Date, Location...)",
+    "submit": "Submit Inquiry",
+    "disclaimer": "By clicking the button you send an inquiry. We will contact you soon for confirmation.",
+    "successTitle": "Thank You!",
+    "successMessage": "Your order has been successfully sent!",
+    "newOrder": "New Order"
+  },
+  "Footer": {
+    "rights": "All rights reserved.",
+    "since": "Established 2025.",
+    "brand": "Catering Belgrade",
+    "description": "Your partner for unforgettable gastronomic experiences. Professional catering for corporate events and private celebrations.",
+    "contact": "Contact"
+  }
+}

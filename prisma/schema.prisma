@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Menu {
+  id          String   @id @default(cuid())
+  name        String   // e.g., "Meni 1 (5 Jela)", "Meni 2 (7 Jela)"
+  dishCount   Int      // 5, 7, or 10
+  price       Decimal? // Optional, since "no payment" was requested, but good to have
+  orders      Order[]
+}
+
+model Dish {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  imageUrl    String?
+  category    DishCategory
+  orders      OrderDish[]
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  clientName  String
+  clientEmail String
+  clientPhone String?
+  eventDate   DateTime?
+  message     String?
+  status      OrderStatus @default(PENDING)
+  
+  menuId      String
+  menu        Menu        @relation(fields: [menuId], references: [id])
+  
+  selectedDishes OrderDish[]
+
+  createdAt   DateTime    @default(now())
+}
+
+model OrderDish {
+  id       String @id @default(cuid())
+  orderId  String
+  order    Order  @relation(fields: [orderId], references: [id])
+  dishId   String
+  dish     Dish   @relation(fields: [dishId], references: [id])
+
+  @@unique([orderId, dishId])
+}
+
+enum DishCategory {
+  APPETIZER
+  MAIN
+  DESSERT
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}

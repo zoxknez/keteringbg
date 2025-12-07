@@ -1,0 +1,56 @@
+{
+  "Index": {
+    "title": "Premium Ketering Beograd",
+    "subtitle": "Ekskluzivni gastronomski užitak za vaše proslave.",
+    "hero": {
+      "badge": "Premium Ketering · Beograd",
+      "titleLine1": "Savršen",
+      "titleLine2": "Ukus",
+      "subtitle": "Ekskluzivni ketering za <bold>korporativne događaje</bold> i <bold>nezaboravne proslave</bold>",
+      "ctaMenu": "Izaberi Meni",
+      "ctaCorporate": "Za Firme",
+      "scroll": "Skroluj"
+    },
+    "trust": {
+      "events": "500+ Događaja",
+      "experience": "10+ Godina Iskustva",
+      "clients": "100% Zadovoljnih Klijenata"
+    }
+  },
+  "Menu": {
+    "dishes": "Jela",
+    "description": "Idealan izbor za manje i srednje proslave. Uključuje predjelo, glavno jelo i dezert.",
+    "select": "Izaberi Meni",
+    "selected": "Izabrano",
+    "back": "Nazad",
+    "next": "Dalje",
+    "appetizers": "Predjela",
+    "mains": "Glavna Jela",
+    "desserts": "Dezerti",
+    "dishesChoice": "jela po izboru",
+    "chooseDishes": "Izaberite jela koja želite",
+    "dishDescription": "Ekskluzivno pripremljeno od najsvežijih sastojaka.",
+    "menuLabel": "Meni",
+    "popular": "Popularno"
+  },
+  "Checkout": {
+    "title": "Vaši Podaci",
+    "changeDishes": "Izmeni Jela",
+    "name": "Ime i Prezime",
+    "phone": "Telefon",
+    "email": "Email Adresa",
+    "note": "Dodatna Napomena (Datum, Lokacija...)",
+    "submit": "Pošalji Upit",
+    "disclaimer": "Klikom na dugme šaljete upit. Kontaktiraćemo vas uskoro radi potvrde.",
+    "successTitle": "Hvala Vam!",
+    "successMessage": "Vaša porudžbina je uspešno poslata!",
+    "newOrder": "Nova Porudžbina"
+  },
+  "Footer": {
+    "rights": "Sva prava zadržana.",
+    "since": "Osnovano 2025.",
+    "brand": "Ketering Beograd",
+    "description": "Vaš partner za nezaboravne gastronomske doživljaje. Profesionalni ketering za korporativne događaje i privatne proslave.",
+    "contact": "Kontakt"
+  }
+}
