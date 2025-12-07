@@ -87,8 +87,6 @@
   "Checkout": {
     "title": "Vaši Podaci",
     "changeDishes": "Izmenite Jela",
-    "orderSummary": "Rezime Porudžbine",
-    "total": "Ukupno",
     "name": "Ime i Prezime",
     "phone": "Telefon",
     "email": "Email Adresa",

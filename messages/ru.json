@@ -87,8 +87,6 @@
   "Checkout": {
     "title": "Ваши Данные",
     "changeDishes": "Измените Блюда",
-    "orderSummary": "Итого Заказа",
-    "total": "Итого",
     "name": "Имя и Фамилия",
     "phone": "Телефон",
     "email": "Email Адрес",
