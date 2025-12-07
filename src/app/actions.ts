@@ -94,7 +94,8 @@ export async function submitOrder(prevState: any, formData: FormData) {
 
     // Send Email
     try {
-      await resend.emails.send({
+      console.log('Attempting to send email with API key:', process.env.RESEND_API_KEY?.substring(0, 10) + '...')
+      const emailResult = await resend.emails.send({
         from: 'Ketering Beograd <onboarding@resend.dev>',
         to: ['spalevic.dragan@gmail.com'], // Owner email
         replyTo: clientEmail, // Allows direct reply to customer
@@ -166,8 +167,10 @@ export async function submitOrder(prevState: any, formData: FormData) {
           </div>
         `
       })
-    } catch (emailError) {
-      console.error('Failed to send email:', emailError)
+      console.log('Email sent successfully:', emailResult)
+    } catch (emailError: any) {
+      console.error('Failed to send email:', emailError?.message || emailError)
+      console.error('Full error:', JSON.stringify(emailError, null, 2))
       // Don't fail the request if email fails, just log it
     }
 
