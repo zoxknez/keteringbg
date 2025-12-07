@@ -6,13 +6,6 @@ import { Check, ChevronRight, ArrowLeft, Utensils } from 'lucide-react'
 import { submitOrder } from '@/app/actions'
 import Image from 'next/image'
 
-type Menu = {
-  id: string
-  name: string
-  dishCount: number
-  price: any
-}
-
 type Dish = {
   id: string
   name: string
@@ -21,9 +14,16 @@ type Dish = {
   description: string | null
 }
 
+type Menu = {
+  id: string
+  name: string
+  dishCount: number
+  price: any
+  dishes: Dish[]
+}
+
 interface MenuSelectorProps {
   menus: Menu[]
-  dishes: Dish[]
 }
 
 const initialState = {
@@ -33,7 +33,7 @@ const initialState = {
 
 import { useTranslations } from 'next-intl'
 
-export default function MenuSelector({ menus, dishes }: MenuSelectorProps) {
+export default function MenuSelector({ menus }: MenuSelectorProps) {
   const t = useTranslations('Menu')
   const tCheckout = useTranslations('Checkout')
   const [step, setStep] = useState<'menu' | 'dishes' | 'checkout'>('menu')
@@ -58,10 +58,12 @@ export default function MenuSelector({ menus, dishes }: MenuSelectorProps) {
     }
   }
 
+  const currentDishes = selectedMenu ? selectedMenu.dishes : []
+
   const groupedDishes = {
-    APPETIZER: dishes.filter(d => d.category === 'APPETIZER'),
-    MAIN: dishes.filter(d => d.category === 'MAIN'),
-    DESSERT: dishes.filter(d => d.category === 'DESSERT'),
+    APPETIZER: currentDishes.filter(d => d.category === 'APPETIZER'),
+    MAIN: currentDishes.filter(d => d.category === 'MAIN'),
+    DESSERT: currentDishes.filter(d => d.category === 'DESSERT'),
   }
 
   if (state.success) {
@@ -202,7 +204,9 @@ export default function MenuSelector({ menus, dishes }: MenuSelectorProps) {
 
             {/* Dishes Grid */}
             <div className="space-y-16">
-              {Object.entries(groupedDishes).map(([category, categoryDishes]) => (
+              {Object.entries(groupedDishes).map(([category, categoryDishes]) => {
+                if (categoryDishes.length === 0) return null
+                return (
                 <div key={category} className="space-y-8">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center">
@@ -245,14 +249,14 @@ export default function MenuSelector({ menus, dishes }: MenuSelectorProps) {
                             {dish.name}
                           </h4>
                           <p className="text-sm text-neutral-600 mt-1 line-clamp-2">
-                            {t('dishDescription')}
+                            {dish.description || t('dishDescription')}
                           </p>
                         </div>
                       </motion.div>
                     ))}
                   </div>
                 </div>
-              ))}
+              )})}
             </div>
           </motion.div>
         )}

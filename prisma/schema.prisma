@@ -12,6 +12,7 @@ model Menu {
   dishCount   Int      // 5, 7, or 10
   price       Decimal? // Optional, since "no payment" was requested, but good to have
   orders      Order[]
+  dishes      Dish[]
 }
 
 model Dish {
@@ -21,6 +22,7 @@ model Dish {
   imageUrl    String?
   category    DishCategory
   orders      OrderDish[]
+  menus       Menu[]
 }
 
 model Order {

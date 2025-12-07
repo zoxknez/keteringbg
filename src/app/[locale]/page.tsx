@@ -7,17 +7,14 @@ export const revalidate = 3600 // Revalidate every hour
 export default async function Home() {
   const t = await getTranslations('Index')
   const menusData = await prisma.menu.findMany({
-    orderBy: { dishCount: 'asc' }
+    orderBy: { price: 'asc' },
+    include: { dishes: true }
   })
   
   const menus = menusData.map(menu => ({
     ...menu,
     price: menu.price ? menu.price.toNumber() : 0
   }))
-  
-  const dishes = await prisma.dish.findMany({
-    orderBy: { category: 'asc' }
-  })
 
   return (
     <div className="flex flex-col">
@@ -112,7 +109,7 @@ export default async function Home() {
             <h2 className="text-5xl md:text-6xl font-serif font-bold text-white">Izaberite Vaš Meni</h2>
             <p className="text-neutral-500 max-w-xl mx-auto">Kreirajte savršen meni za vašu priliku - od elegantnih koktela do raskošnih gozbi</p>
           </div>
-          <MenuSelector menus={menus} dishes={dishes} />
+          <MenuSelector menus={menus} />
         </div>
       </section>
     </div>
