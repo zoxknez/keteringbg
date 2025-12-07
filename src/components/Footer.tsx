@@ -62,8 +62,8 @@ export default function Footer() {
             <div className="space-y-2 text-sm">
               <p className="font-medium text-white">Dragan Spalević PR</p>
               <p className="text-neutral-500">Ketering Beograd</p>
-              <p className="text-neutral-500">MB: 67667987</p>
-              <p className="text-neutral-500">PIB: 114546222</p>
+              <p className="text-neutral-500">PIB: 114970001</p>
+              <p className="text-neutral-500">MB: 67992032</p>
             </div>
           </div>
         </div>
