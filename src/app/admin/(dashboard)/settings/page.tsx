@@ -91,23 +91,23 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-4 md:space-y-6 max-w-3xl">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-serif font-bold text-white">Podešavanja</h1>
-        <p className="text-neutral-500 mt-1">Upravljajte osnovnim podešavanjima sajta</p>
+        <h1 className="text-2xl md:text-3xl font-serif font-bold text-white">Podešavanja</h1>
+        <p className="text-neutral-500 mt-1 text-sm md:text-base">Upravljajte osnovnim podešavanjima sajta</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
         {/* Basic Info */}
-        <div className="bg-neutral-900 rounded-2xl border border-neutral-800 overflow-hidden">
-          <div className="px-6 py-4 border-b border-neutral-800 bg-neutral-800/50">
-            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-              <Globe className="w-5 h-5 text-amber-500" />
+        <div className="bg-neutral-900 rounded-xl md:rounded-2xl border border-neutral-800 overflow-hidden">
+          <div className="px-4 md:px-6 py-3 md:py-4 border-b border-neutral-800 bg-neutral-800/50">
+            <h2 className="text-base md:text-lg font-semibold text-white flex items-center gap-2">
+              <Globe className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
               Osnovne Informacije
             </h2>
           </div>
-          <div className="p-6 space-y-4">
+          <div className="p-4 md:p-6 space-y-4">
             <div>
               <label className="block text-sm font-medium text-neutral-400 mb-2">
                 Naziv Sajta

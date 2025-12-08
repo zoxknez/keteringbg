@@ -16,10 +16,13 @@ export default async function AdminLayout({
 
   return (
     <SessionProvider session={session}>
-      <div className="min-h-screen bg-neutral-950 flex">
+      <div className="min-h-screen bg-neutral-950">
         <AdminSidebar />
-        <main className="flex-1 ml-64 p-8">
-          {children}
+        {/* Main content with responsive padding */}
+        <main className="lg:ml-64 pt-16 lg:pt-0 min-h-screen">
+          <div className="p-4 md:p-6 lg:p-8">
+            {children}
+          </div>
         </main>
       </div>
     </SessionProvider>
