@@ -57,7 +57,7 @@ export async function generateMetadata({
       },
     },
     verification: {
-      google: 'YOUR_GOOGLE_VERIFICATION_CODE',
+      google: 'Phm1sOTCtlXTtuSTXWg88VexucQ6m89iz8GYxY5RD9A',
     },
     robots: {
       index: true,
