@@ -10,11 +10,13 @@ import {
   Image, 
   Settings, 
   LogOut,
-  CheckCircle
+  CheckCircle,
+  ShoppingCart
 } from 'lucide-react'
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/orders', label: 'Narudžbine', icon: ShoppingCart },
   { href: '/admin/dishes', label: 'Jela', icon: UtensilsCrossed },
   { href: '/admin/menus', label: 'Meniji', icon: BookOpen },
   { href: '/admin/availability', label: 'Dostupnost', icon: CheckCircle },

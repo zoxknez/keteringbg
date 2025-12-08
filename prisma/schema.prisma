@@ -97,8 +97,16 @@ model Admin {
 
 // Site settings/content management
 model SiteSettings {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  value     String
-  updatedAt DateTime @default(now()) @updatedAt
+  id            String   @id @default(cuid())
+  siteName      String   @default("Ketering BGD")
+  contactPhone  String   @default("")
+  contactEmail  String   @default("")
+  address       String   @default("")
+  workingHours  String   @default("")
+  instagramUrl  String   @default("")
+  facebookUrl   String   @default("")
+  googleMapsUrl String   @default("")
+  footerText    String   @default("")
+  updatedAt     DateTime @default(now()) @updatedAt
 }
+

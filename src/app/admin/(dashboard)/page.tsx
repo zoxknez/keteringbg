@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
-import { UtensilsCrossed, BookOpen, ShoppingCart, TrendingUp } from 'lucide-react'
+import Link from 'next/link'
+import { UtensilsCrossed, BookOpen, ShoppingCart, TrendingUp, Eye } from 'lucide-react'
 
 export default async function AdminDashboard() {
   const [dishCount, menuCount, orderCount] = await Promise.all([
@@ -54,8 +55,14 @@ export default async function AdminDashboard() {
 
       {/* Recent Orders */}
       <div className="bg-neutral-900 rounded-2xl border border-neutral-800 overflow-hidden">
-        <div className="p-6 border-b border-neutral-800">
+        <div className="p-6 border-b border-neutral-800 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-white">Poslednje Narudžbine</h2>
+          <Link 
+            href="/admin/orders" 
+            className="text-sm text-amber-500 hover:text-amber-400 transition-colors"
+          >
+            Pogledaj sve →
+          </Link>
         </div>
         <div className="divide-y divide-neutral-800">
           {recentOrders.length === 0 ? (
@@ -64,27 +71,34 @@ export default async function AdminDashboard() {
             </div>
           ) : (
             recentOrders.map((order) => (
-              <div key={order.id} className="p-6 flex items-center justify-between hover:bg-neutral-800/50 transition-colors">
+              <Link 
+                key={order.id} 
+                href={`/admin/orders/${order.id}`}
+                className="p-6 flex items-center justify-between hover:bg-neutral-800/50 transition-colors block"
+              >
                 <div>
                   <p className="font-medium text-white">{order.clientName}</p>
                   <p className="text-sm text-neutral-500">{order.menu.name}</p>
                 </div>
-                <div className="text-right">
-                  <p className={`text-sm font-medium ${
-                    order.status === 'COMPLETED' ? 'text-green-500' :
-                    order.status === 'PENDING' ? 'text-amber-500' :
-                    order.status === 'CONFIRMED' ? 'text-blue-500' :
-                    'text-red-500'
-                  }`}>
-                    {order.status === 'PENDING' ? 'Na čekanju' :
-                     order.status === 'CONFIRMED' ? 'Potvrđeno' :
-                     order.status === 'COMPLETED' ? 'Završeno' : 'Otkazano'}
-                  </p>
-                  <p className="text-xs text-neutral-500">
-                    {new Date(order.createdAt).toLocaleDateString('sr-RS')}
-                  </p>
+                <div className="flex items-center gap-4">
+                  <div className="text-right">
+                    <p className={`text-sm font-medium ${
+                      order.status === 'COMPLETED' ? 'text-green-500' :
+                      order.status === 'PENDING' ? 'text-amber-500' :
+                      order.status === 'CONFIRMED' ? 'text-blue-500' :
+                      'text-red-500'
+                    }`}>
+                      {order.status === 'PENDING' ? 'Na čekanju' :
+                       order.status === 'CONFIRMED' ? 'Potvrđeno' :
+                       order.status === 'COMPLETED' ? 'Završeno' : 'Otkazano'}
+                    </p>
+                    <p className="text-xs text-neutral-500">
+                      {new Date(order.createdAt).toLocaleDateString('sr-RS')}
+                    </p>
+                  </div>
+                  <Eye className="w-5 h-5 text-neutral-500" />
                 </div>
-              </div>
+              </Link>
             ))
           )}
         </div>
