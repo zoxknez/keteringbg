@@ -31,6 +31,10 @@ export async function generateMetadata({
     description: t('description'),
     keywords: t('keywords'),
     metadataBase: new URL('https://www.keteringbeo.rs'),
+    icons: {
+      icon: '/icon',
+      apple: '/apple-icon',
+    },
     openGraph: {
       title: t('title'),
       description: t('description'),
@@ -38,20 +42,11 @@ export async function generateMetadata({
       siteName: 'Ketering Beograd',
       locale: locale,
       type: 'website',
-      images: [
-        {
-          url: '/og-image.jpg',
-          width: 1200,
-          height: 630,
-          alt: t('title'),
-        },
-      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: t('title'),
       description: t('description'),
-      images: ['/og-image.jpg'],
     },
     alternates: {
       canonical: `https://www.keteringbeo.rs/${locale}`,
@@ -60,6 +55,9 @@ export async function generateMetadata({
         'en': 'https://www.keteringbeo.rs/en',
         'ru': 'https://www.keteringbeo.rs/ru',
       },
+    },
+    verification: {
+      google: 'YOUR_GOOGLE_VERIFICATION_CODE',
     },
     robots: {
       index: true,
