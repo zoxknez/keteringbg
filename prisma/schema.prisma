@@ -20,13 +20,17 @@ model Dish {
   name        String
   description String?
   imageUrl    String?
+  videoUrl    String?
   category    DishCategory
   tags        DishTag[]    @default([])
   isVegetarian Boolean     @default(false)
   isVegan     Boolean      @default(false)
   isFasting   Boolean      @default(false) // Posno
+  isAvailable Boolean      @default(true)  // Daily availability toggle
   orders      OrderDish[]
   menus       Menu[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt
 }
 
 enum DishTag {
@@ -79,4 +83,22 @@ enum OrderStatus {
   CONFIRMED
   COMPLETED
   CANCELLED
+}
+
+// Admin user for authentication
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   // hashed password
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+// Site settings/content management
+model SiteSettings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @default(now()) @updatedAt
 }
