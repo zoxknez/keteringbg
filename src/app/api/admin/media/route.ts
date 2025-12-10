@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { readdir, stat } from 'fs/promises'
-import path from 'path'
+import { list } from '@vercel/blob'
 
 export async function GET() {
   const session = await auth()
@@ -10,37 +9,20 @@ export async function GET() {
   }
 
   try {
-    const dishesDir = path.join(process.cwd(), 'public', 'dishes')
+    const { blobs } = await list()
     
-    const files: { name: string; url: string; type: 'image' | 'video'; size?: number }[] = []
-    
-    try {
-      const entries = await readdir(dishesDir)
+    const files = blobs.map(blob => {
+      const ext = blob.pathname.split('.').pop()?.toLowerCase() || ''
+      const isVideo = ['mp4', 'webm', 'mov'].includes(ext)
       
-      for (const entry of entries) {
-        if (entry === 'README.md') continue
-        
-        const filePath = path.join(dishesDir, entry)
-        const fileStat = await stat(filePath)
-        
-        if (fileStat.isFile()) {
-          const ext = path.extname(entry).toLowerCase()
-          const isVideo = ['.mp4', '.webm', '.mov'].includes(ext)
-          const isImage = ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext)
-          
-          if (isImage || isVideo) {
-            files.push({
-              name: entry,
-              url: `/dishes/${entry}`,
-              type: isVideo ? 'video' : 'image',
-              size: fileStat.size,
-            })
-          }
-        }
+      return {
+        name: blob.pathname,
+        url: blob.url,
+        type: isVideo ? 'video' : 'image',
+        size: blob.size,
+        lastModified: blob.uploadedAt
       }
-    } catch {
-      // Directory doesn't exist yet, that's fine
-    }
+    })
     
     return NextResponse.json({ files })
   } catch (error) {

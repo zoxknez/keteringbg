@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { writeFile, mkdir } from 'fs/promises'
-import path from 'path'
-import { existsSync } from 'fs'
+import { put } from '@vercel/blob'
 
 export async function POST(req: NextRequest) {
   const session = await auth()
@@ -31,27 +29,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'File too large' }, { status: 400 })
     }
 
-    // Create unique filename
-    const timestamp = Date.now()
-    const ext = path.extname(file.name)
-    const filename = `${timestamp}-${Math.random().toString(36).substring(7)}${ext}`
+    // Upload to Vercel Blob
+    // We use the type as a folder prefix
+    const filename = `${type}/${file.name}`
+    
+    const blob = await put(filename, file, {
+      access: 'public',
+    })
 
-    // Ensure upload directory exists
-    const uploadDir = path.join(process.cwd(), 'public', type)
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true })
-    }
-
-    // Save file
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    const filePath = path.join(uploadDir, filename)
-    await writeFile(filePath, buffer)
-
-    // Return the public URL
-    const url = `/${type}/${filename}`
-
-    return NextResponse.json({ url, filename })
+    return NextResponse.json({ url: blob.url, filename: blob.pathname })
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
