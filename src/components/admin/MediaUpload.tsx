@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { X, Image as ImageIcon, Video } from 'lucide-react'
+import { X, Image as ImageIcon, Video, FolderOpen } from 'lucide-react'
+import MediaLibraryModal from './MediaLibraryModal'
 
 interface MediaUploadProps {
   value?: string
@@ -13,6 +14,7 @@ interface MediaUploadProps {
 export default function MediaUpload({ value, onChange, type = 'image', label }: MediaUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
+  const [showLibrary, setShowLibrary] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const acceptTypes = type === 'video' 
@@ -62,8 +64,25 @@ export default function MediaUpload({ value, onChange, type = 'image', label }: 
   return (
     <div className="space-y-2">
       {label && (
-        <label className="block text-sm font-medium text-neutral-400">{label}</label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-neutral-400">{label}</label>
+          <button
+            type="button"
+            onClick={() => setShowLibrary(true)}
+            className="text-xs text-amber-500 hover:text-amber-400 flex items-center gap-1"
+          >
+            <FolderOpen className="w-3 h-3" />
+            Izaberi iz biblioteke
+          </button>
+        </div>
       )}
+      
+      <MediaLibraryModal
+        isOpen={showLibrary}
+        onClose={() => setShowLibrary(false)}
+        onSelect={onChange}
+        type={type}
+      />
       
       {value ? (
         <div className="relative rounded-xl overflow-hidden bg-neutral-800 border border-neutral-700">
@@ -126,7 +145,17 @@ export default function MediaUpload({ value, onChange, type = 'image', label }: 
                 <p className="text-white font-medium">
                   Prevucite fajl ovde ili kliknite
                 </p>
-                <p className="text-neutral-500 text-sm mt-1">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setShowLibrary(true)
+                  }}
+                  className="text-amber-500 hover:text-amber-400 text-sm mt-1 font-medium hover:underline"
+                >
+                  ili izaberite iz biblioteke
+                </button>
+                <p className="text-neutral-500 text-sm mt-2">
                   {type === 'video' ? 'MP4, WebM do 50MB' : 
                    type === 'both' ? 'Slike i video do 50MB' :
                    'JPG, PNG, WebP, GIF do 10MB'}
