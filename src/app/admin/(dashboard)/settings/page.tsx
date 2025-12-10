@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Save, Globe, Phone, MapPin, Clock, Mail, Instagram, Facebook, Check } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface SiteSettings {
   id?: string
@@ -67,12 +68,13 @@ export default function SettingsPage() {
 
       if (res.ok) {
         setSaved(true)
+        toast.success('Podešavanja uspešno sačuvana')
         setTimeout(() => setSaved(false), 3000)
       } else {
-        alert('Greška pri čuvanju podešavanja')
+        toast.error('Greška pri čuvanju podešavanja')
       }
     } catch {
-      alert('Greška pri čuvanju podešavanja')
+      toast.error('Greška pri čuvanju podešavanja')
     } finally {
       setSaving(false)
     }

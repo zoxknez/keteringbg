@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, Check } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface Menu {
   id: string
@@ -54,7 +55,7 @@ export default function NewOrderForm({ menus, dishes }: NewOrderFormProps) {
     e.preventDefault()
     
     if (!selectedMenuId) {
-      alert('Izaberite meni')
+      toast.error('Izaberite meni')
       return
     }
     
@@ -71,13 +72,14 @@ export default function NewOrderForm({ menus, dishes }: NewOrderFormProps) {
       })
 
       if (res.ok) {
+        toast.success('Narudžbina uspešno kreirana')
         router.push('/admin/orders')
         router.refresh()
       } else {
-        alert('Greška pri kreiranju narudžbine')
+        toast.error('Greška pri kreiranju narudžbine')
       }
     } catch {
-      alert('Greška pri kreiranju narudžbine')
+      toast.error('Greška pri kreiranju narudžbine')
     } finally {
       setSaving(false)
     }

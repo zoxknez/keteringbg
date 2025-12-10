@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 export default function OrderActions({ orderId }: { orderId: string }) {
   const router = useRouter()
@@ -14,12 +15,13 @@ export default function OrderActions({ orderId }: { orderId: string }) {
         method: 'DELETE',
       })
       if (res.ok) {
+        toast.success('Narudžbina uspešno obrisana')
         router.refresh()
       } else {
-        alert('Greška pri brisanju narudžbine')
+        toast.error('Greška pri brisanju narudžbine')
       }
     } catch {
-      alert('Greška pri brisanju narudžbine')
+      toast.error('Greška pri brisanju narudžbine')
     }
   }
 

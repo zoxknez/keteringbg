@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import MediaUpload from '@/components/admin/MediaUpload'
 import { ArrowLeft, Save } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 interface DishFormProps {
   dish?: {
@@ -53,13 +54,14 @@ export default function DishForm({ dish }: DishFormProps) {
       })
 
       if (res.ok) {
+        toast.success(dish ? 'Jelo uspešno izmenjeno' : 'Jelo uspešno kreirano')
         router.push('/admin/dishes')
         router.refresh()
       } else {
-        alert('Greška pri čuvanju')
+        toast.error('Greška pri čuvanju')
       }
     } catch {
-      alert('Greška pri čuvanju')
+      toast.error('Greška pri čuvanju')
     } finally {
       setLoading(false)
     }

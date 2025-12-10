@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Pencil, Trash2, Search, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 interface Dish {
   id: string
@@ -46,12 +47,13 @@ export default function DishesTable({ dishes }: DishesTableProps) {
     try {
       const res = await fetch(`/api/admin/dishes/${id}`, { method: 'DELETE' })
       if (res.ok) {
+        toast.success('Jelo uspešno obrisano')
         router.refresh()
       } else {
-        alert('Greška pri brisanju')
+        toast.error('Greška pri brisanju')
       }
     } catch {
-      alert('Greška pri brisanju')
+      toast.error('Greška pri brisanju')
     } finally {
       setDeleting(null)
     }
@@ -65,10 +67,11 @@ export default function DishesTable({ dishes }: DishesTableProps) {
         body: JSON.stringify({ isAvailable: !currentValue })
       })
       if (res.ok) {
+        toast.success(currentValue ? 'Jelo sakriveno' : 'Jelo vidljivo')
         router.refresh()
       }
     } catch {
-      alert('Greška pri ažuriranju')
+      toast.error('Greška pri ažuriranju')
     }
   }
 

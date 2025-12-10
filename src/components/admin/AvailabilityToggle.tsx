@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check, X, CheckCircle, XCircle } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface AvailabilityToggleProps {
   dish?: {
@@ -29,10 +30,11 @@ export default function AvailabilityToggle({ dish, action }: AvailabilityToggleP
           body: JSON.stringify({ action })
         })
         if (res.ok) {
+          toast.success(action === 'enableAll' ? 'Sva jela uključena' : 'Sva jela isključena')
           router.refresh()
         }
       } catch {
-        alert('Greška')
+        toast.error('Greška')
       } finally {
         setLoading(false)
       }

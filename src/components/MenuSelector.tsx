@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useActionState } from 'react'
+import { useState, useActionState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check, ChevronRight, ArrowLeft, ChevronDown, Plus, Minus, ShoppingCart, Trash2, X } from 'lucide-react'
 import { submitOrder } from '@/app/actions'
 import Image from 'next/image'
 import { useTranslations, useLocale } from 'next-intl'
+import { toast } from 'sonner'
 
 type Dish = {
   id: string
@@ -64,8 +65,8 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
   const tOrder = useTranslations('Order')
   const locale = useLocale()
   
-  // Koraci: menu -> dishes -> order -> checkout
-  const [step, setStep] = useState<'menu' | 'dishes' | 'order' | 'checkout'>('menu')
+  // Koraci: menu -> dishes -> order -> checkout -> success
+  const [step, setStep] = useState<'menu' | 'dishes' | 'order' | 'checkout' | 'success'>('menu')
   
   // Trenutno selektovani meni i jela
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null)
@@ -83,6 +84,16 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
   const [expandedCategories, setExpandedCategories] = useState<string[]>([])
   
   const [state, formAction] = useActionState(submitOrder, initialState)
+
+  useEffect(() => {
+    if (state.success) {
+      setStep('success')
+      setOrderItems([])
+      toast.success(state.message)
+    } else if (state.message) {
+      toast.error(state.message)
+    }
+  }, [state])
 
   // Izračunaj ukupnu cenu porudžbine
   const totalPrice = orderItems.reduce((sum, item) => sum + (item.menuPrice * item.portions), 0)
@@ -229,7 +240,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+            className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
           >
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
@@ -260,7 +271,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+            className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
           >
             <motion.div 
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -368,7 +379,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                 </div>
 
                 {/* Decorative */}
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-amber-500/30 to-amber-500/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-2xl" />
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-linear-to-br from-amber-500/30 to-amber-500/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-2xl" />
               </motion.div>
             ))}
           </motion.div>
@@ -515,7 +526,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                               whileTap={{ scale: 0.98 }}
                               className={`group cursor-pointer bg-neutral-900/60 backdrop-blur rounded-2xl overflow-hidden transition-all duration-300 border-2 ${selectedDishIds.includes(dish.id) ? 'border-amber-500' : 'border-white/5 hover:border-white/10'}`}
                             >
-                              <div className="relative aspect-[4/3] overflow-hidden">
+                              <div className="relative aspect-4/3 overflow-hidden">
                                 <Image 
                                   src={dish.imageUrl || ''} 
                                   alt={dish.name}
@@ -633,7 +644,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
           >
             <div className="bg-neutral-900/80 backdrop-blur-xl rounded-3xl p-6 md:p-10 border border-white/10 relative overflow-hidden">
               {/* Decorative accent */}
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-amber-600" />
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-amber-400 to-amber-600" />
               
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl md:text-3xl font-serif font-bold text-white flex items-center gap-3">
@@ -718,7 +729,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                   </button>
 
                   {/* Ukupno */}
-                  <div className="bg-gradient-to-r from-amber-500/20 to-amber-600/20 rounded-2xl p-6 border border-amber-500/30 mb-6">
+                  <div className="bg-linear-to-r from-amber-500/20 to-amber-600/20 rounded-2xl p-6 border border-amber-500/30 mb-6">
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-neutral-400">{tOrder('totalPortions')}:</span>
                       <span className="text-white font-bold">{totalPortions}</span>
@@ -755,7 +766,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
           >
             <div className="bg-neutral-900/80 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-white/10 relative overflow-hidden">
               {/* Decorative accent */}
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-amber-600" />
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-amber-400 to-amber-600" />
               
               <button onClick={() => setStep('order')} className="flex items-center gap-3 group mb-8">
                 <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-500 text-slate-400 group-hover:text-slate-900 transition-all duration-300">
@@ -838,7 +849,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                       name="eventDate" 
                       type="datetime-local" 
                       min={new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 16)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700 [color-scheme:dark]"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700 scheme-dark"
                     />
                   </div>
                 </div>
@@ -863,6 +874,38 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                   </svg>
                 </button>
               </form>
+            </div>
+          </motion.div>
+        )}
+        {/* KORAK 5: Success */}
+        {step === 'success' && (
+          <motion.div
+            key="success"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="max-w-2xl mx-auto text-center"
+          >
+            <div className="bg-neutral-900/80 backdrop-blur-xl rounded-3xl p-12 border border-white/10 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-green-400 to-green-600" />
+              
+              <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-8">
+                <Check className="w-12 h-12 text-green-500" />
+              </div>
+              
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-4">
+                {tCheckout('successTitle') || 'Hvala vam!'}
+              </h2>
+              <p className="text-neutral-400 text-lg mb-8">
+                {tCheckout('successMessage') || 'Vaša porudžbina je uspešno primljena. Poslali smo vam email sa detaljima.'}
+              </p>
+              
+              <button
+                onClick={() => setStep('menu')}
+                className="px-8 py-4 bg-amber-500 text-black hover:bg-amber-400 rounded-xl font-bold text-sm uppercase tracking-widest transition-all"
+              >
+                {tOrder('startOrdering')}
+              </button>
             </div>
           </motion.div>
         )}

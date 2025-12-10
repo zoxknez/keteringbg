@@ -3,11 +3,40 @@ import Link from 'next/link'
 import { UtensilsCrossed, BookOpen, ShoppingCart, TrendingUp, ChevronRight } from 'lucide-react'
 
 export default async function AdminDashboard() {
-  const [dishCount, menuCount, orderCount] = await Promise.all([
+  const now = new Date()
+  const firstDayThisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+  const firstDayLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const lastDayLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
+
+  const [dishCount, menuCount, orderCount, thisMonthOrders, lastMonthOrders] = await Promise.all([
     prisma.dish.count(),
     prisma.menu.count(),
     prisma.order.count(),
+    prisma.order.count({
+      where: {
+        createdAt: {
+          gte: firstDayThisMonth
+        }
+      }
+    }),
+    prisma.order.count({
+      where: {
+        createdAt: {
+          gte: firstDayLastMonth,
+          lte: lastDayLastMonth
+        }
+      }
+    })
   ])
+
+  let growth = 0
+  if (lastMonthOrders > 0) {
+    growth = ((thisMonthOrders - lastMonthOrders) / lastMonthOrders) * 100
+  } else if (thisMonthOrders > 0) {
+    growth = 100
+  }
+  
+  const growthFormatted = growth > 0 ? `+${growth.toFixed(0)}%` : `${growth.toFixed(0)}%`
 
   const recentOrders = await prisma.order.findMany({
     take: 5,
@@ -19,7 +48,7 @@ export default async function AdminDashboard() {
     { label: 'Ukupno Jela', value: dishCount, icon: UtensilsCrossed, color: 'amber' },
     { label: 'Menija', value: menuCount, icon: BookOpen, color: 'blue' },
     { label: 'Narudžbina', value: orderCount, icon: ShoppingCart, color: 'green' },
-    { label: 'Ovog Meseca', value: '+12%', icon: TrendingUp, color: 'purple' },
+    { label: 'Ovog Meseca', value: growthFormatted, icon: TrendingUp, color: 'purple' },
   ]
 
   return (

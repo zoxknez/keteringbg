@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { X, Image as ImageIcon, Video, FolderOpen } from 'lucide-react'
+import { toast } from 'sonner'
 import MediaLibraryModal from './MediaLibraryModal'
 
 interface MediaUploadProps {
@@ -41,7 +42,7 @@ export default function MediaUpload({ value, onChange, type = 'image', label }: 
       onChange(data.url)
     } catch (error) {
       console.error('Upload error:', error)
-      alert('Greška pri upload-u')
+      toast.error('Greška pri upload-u')
     } finally {
       setUploading(false)
     }

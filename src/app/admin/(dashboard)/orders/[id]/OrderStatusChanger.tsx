@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface OrderStatusChangerProps {
   orderId: string
@@ -34,12 +35,13 @@ export default function OrderStatusChanger({ orderId, currentStatus }: OrderStat
       
       if (res.ok) {
         setStatus(newStatus as typeof currentStatus)
+        toast.success('Status uspešno promenjen')
         router.refresh()
       } else {
-        alert('Greška pri promeni statusa')
+        toast.error('Greška pri promeni statusa')
       }
     } catch {
-      alert('Greška pri promeni statusa')
+      toast.error('Greška pri promeni statusa')
     } finally {
       setSaving(false)
     }

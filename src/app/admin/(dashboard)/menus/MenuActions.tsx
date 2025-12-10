@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface MenuActionsProps {
   menuId: string
@@ -20,12 +21,13 @@ export default function MenuActions({ menuId, menuName }: MenuActionsProps) {
     try {
       const res = await fetch(`/api/admin/menus/${menuId}`, { method: 'DELETE' })
       if (res.ok) {
+        toast.success('Meni uspešno obrisan')
         router.refresh()
       } else {
-        alert('Greška pri brisanju')
+        toast.error('Greška pri brisanju')
       }
     } catch {
-      alert('Greška pri brisanju')
+      toast.error('Greška pri brisanju')
     } finally {
       setDeleting(false)
     }

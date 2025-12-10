@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Save } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface MenuFormProps {
   menu?: {
@@ -41,13 +42,14 @@ export default function MenuForm({ menu }: MenuFormProps) {
       })
 
       if (res.ok) {
+        toast.success(menu ? 'Meni uspešno izmenjen' : 'Meni uspešno kreiran')
         router.push('/admin/menus')
         router.refresh()
       } else {
-        alert('Greška pri čuvanju')
+        toast.error('Greška pri čuvanju')
       }
     } catch {
-      alert('Greška pri čuvanju')
+      toast.error('Greška pri čuvanju')
     } finally {
       setLoading(false)
     }

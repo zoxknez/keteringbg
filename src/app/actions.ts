@@ -86,7 +86,7 @@ export async function submitOrder(prevState: { success: boolean; message: string
       </div>
     `).join('')
 
-    // Send Email
+    // Send Email to Admin
     try {
       console.log('=== ORDER SUBMISSION ===')
       console.log('Customer:', clientName, clientPhone, clientEmail)
@@ -94,7 +94,8 @@ export async function submitOrder(prevState: { success: boolean; message: string
       console.log('Total:', orderData.totalPrice, 'RSD')
       console.log('API Key prefix:', process.env.RESEND_API_KEY?.substring(0, 10) + '...')
       
-      const emailResult = await resend.emails.send({
+      // 1. Email to Admin
+      await resend.emails.send({
         from: 'Ketering Beograd <onboarding@resend.dev>',
         to: ['spalevic.dragan@gmail.com'],
         replyTo: clientEmail,
@@ -181,7 +182,66 @@ export async function submitOrder(prevState: { success: boolean; message: string
           </div>
         `
       })
-      console.log('Email sent successfully:', emailResult)
+
+      // 2. Email to Client (Confirmation)
+      await resend.emails.send({
+        from: 'Ketering Beograd <onboarding@resend.dev>',
+        to: [clientEmail],
+        subject: '✅ Primili smo vašu porudžbinu - Ketering Beograd',
+        html: `
+          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9fafb;">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #1f2937 0%, #111827 100%); padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Hvala na poverenju!</h1>
+              <p style="color: #9ca3af; margin: 10px 0 0 0; font-size: 16px;">
+                Vaša porudžbina je uspešno primljena.
+              </p>
+            </div>
+            
+            <div style="padding: 25px; background-color: #ffffff; border-left: 1px solid #e5e5e5; border-right: 1px solid #e5e5e5;">
+              <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+                Poštovani/a <strong>${clientName}</strong>,
+              </p>
+              <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+                Hvala što ste izabrali Ketering Beograd. Vaša porudžbina je u obradi i uskoro ćemo vas kontaktirati radi potvrde detalja.
+              </p>
+
+              <!-- Order Summary -->
+              <div style="background-color: #f3f4f6; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+                <h3 style="color: #1f2937; margin: 0 0 15px 0; font-size: 16px;">Pregled porudžbine:</h3>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                  <li style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between;">
+                    <span style="color: #6b7280;">Datum događaja:</span>
+                    <span style="color: #1f2937; font-weight: 600;">
+                      ${eventDate ? eventDate.toLocaleDateString('sr-RS', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Nije navedeno'}
+                    </span>
+                  </li>
+                  <li style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between;">
+                    <span style="color: #6b7280;">Ukupno porcija:</span>
+                    <span style="color: #1f2937; font-weight: 600;">${orderData.totalPortions}</span>
+                  </li>
+                  <li style="padding: 8px 0; display: flex; justify-content: space-between;">
+                    <span style="color: #6b7280;">Ukupna cena:</span>
+                    <span style="color: #d97706; font-weight: 700;">${orderData.totalPrice.toLocaleString()} RSD</span>
+                  </li>
+                </ul>
+              </div>
+
+              <p style="color: #6b7280; font-size: 14px; line-height: 1.5; margin-top: 20px; text-align: center;">
+                Ako imate bilo kakvih pitanja, slobodno odgovorite na ovaj email ili nas pozovite.
+              </p>
+            </div>
+            
+            <!-- Footer -->
+            <div style="background-color: #f3f4f6; padding: 20px; text-align: center; border-radius: 0 0 12px 12px; border: 1px solid #e5e5e5; border-top: none;">
+              <p style="color: #1f2937; font-weight: 600; margin: 0;">Ketering Beograd</p>
+              <p style="color: #6b7280; font-size: 12px; margin: 5px 0 0 0;">Ekskluzivni ketering za vaše proslave</p>
+            </div>
+          </div>
+        `
+      })
+
+      console.log('Emails sent successfully')
     } catch (emailError: unknown) {
       const error = emailError as { message?: string }
       console.error('Failed to send email:', error?.message || emailError)

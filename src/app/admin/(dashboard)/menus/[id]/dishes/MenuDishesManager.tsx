@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check, Save } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface Dish {
   id: string
@@ -56,12 +57,12 @@ export default function MenuDishesManager({
       })
       if (res.ok) {
         router.refresh()
-        alert('Jela uspešno sačuvana!')
+        toast.success('Jela uspešno sačuvana!')
       } else {
-        alert('Greška pri čuvanju')
+        toast.error('Greška pri čuvanju')
       }
     } catch {
-      alert('Greška pri čuvanju')
+      toast.error('Greška pri čuvanju')
     } finally {
       setSaving(false)
     }
