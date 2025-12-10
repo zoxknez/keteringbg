@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
+import { Analytics } from "@vercel/analytics/next";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -151,6 +152,7 @@ export default async function RootLayout({
             {children}
           </main>
           <Footer />
+          <Analytics />
         </NextIntlClientProvider>
       </body>
     </html>
