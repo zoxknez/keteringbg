@@ -147,7 +147,7 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <Background />
           <LanguageSwitcher />
-          <main className="flex-grow relative z-10">
+          <main className="grow relative z-10">
             {children}
           </main>
           <Footer />

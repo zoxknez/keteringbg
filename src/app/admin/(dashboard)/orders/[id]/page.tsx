@@ -72,14 +72,14 @@ export default async function OrderDetailPage({
             </div>
             <div className="p-4 md:p-6 space-y-3 md:space-y-4">
               <div className="flex items-start gap-3">
-                <User className="w-4 h-4 md:w-5 md:h-5 text-neutral-500 mt-0.5 flex-shrink-0" />
+                <User className="w-4 h-4 md:w-5 md:h-5 text-neutral-500 mt-0.5 shrink-0" />
                 <div className="min-w-0">
                   <p className="text-xs md:text-sm text-neutral-500">Ime</p>
                   <p className="text-white font-medium truncate">{order.clientName}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <Mail className="w-4 h-4 md:w-5 md:h-5 text-neutral-500 mt-0.5 flex-shrink-0" />
+                <Mail className="w-4 h-4 md:w-5 md:h-5 text-neutral-500 mt-0.5 shrink-0" />
                 <div className="min-w-0">
                   <p className="text-xs md:text-sm text-neutral-500">Email</p>
                   <a href={`mailto:${order.clientEmail}`} className="text-amber-500 hover:underline text-sm md:text-base break-all">
@@ -89,7 +89,7 @@ export default async function OrderDetailPage({
               </div>
               {order.clientPhone && (
                 <div className="flex items-start gap-3">
-                  <Phone className="w-4 h-4 md:w-5 md:h-5 text-neutral-500 mt-0.5 flex-shrink-0" />
+                  <Phone className="w-4 h-4 md:w-5 md:h-5 text-neutral-500 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-xs md:text-sm text-neutral-500">Telefon</p>
                     <a href={`tel:${order.clientPhone}`} className="text-amber-500 hover:underline">
@@ -100,7 +100,7 @@ export default async function OrderDetailPage({
               )}
               {order.address && (
                 <div className="flex items-start gap-3">
-                  <MapPin className="w-4 h-4 md:w-5 md:h-5 text-neutral-500 mt-0.5 flex-shrink-0" />
+                  <MapPin className="w-4 h-4 md:w-5 md:h-5 text-neutral-500 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-xs md:text-sm text-neutral-500">Adresa</p>
                     <p className="text-white text-sm md:text-base">{order.address}</p>
@@ -126,9 +126,9 @@ export default async function OrderDetailPage({
                     {appetizers.map(({ dish }) => (
                       <div key={dish.id} className="flex items-center gap-3 p-2 md:p-3 bg-neutral-800 rounded-lg md:rounded-xl">
                         {dish.imageUrl ? (
-                          <img src={dish.imageUrl} alt={dish.name} className="w-10 h-10 md:w-12 md:h-12 rounded-lg object-cover flex-shrink-0" />
+                          <img src={dish.imageUrl} alt={dish.name} className="w-10 h-10 md:w-12 md:h-12 rounded-lg object-cover shrink-0" />
                         ) : (
-                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-neutral-700 flex items-center justify-center flex-shrink-0">🍽️</div>
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-neutral-700 flex items-center justify-center shrink-0">🍽️</div>
                         )}
                         <span className="text-white font-medium text-sm md:text-base truncate">{dish.name}</span>
                       </div>
@@ -144,9 +144,9 @@ export default async function OrderDetailPage({
                     {mains.map(({ dish }) => (
                       <div key={dish.id} className="flex items-center gap-3 p-2 md:p-3 bg-neutral-800 rounded-lg md:rounded-xl">
                         {dish.imageUrl ? (
-                          <img src={dish.imageUrl} alt={dish.name} className="w-10 h-10 md:w-12 md:h-12 rounded-lg object-cover flex-shrink-0" />
+                          <img src={dish.imageUrl} alt={dish.name} className="w-10 h-10 md:w-12 md:h-12 rounded-lg object-cover shrink-0" />
                         ) : (
-                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-neutral-700 flex items-center justify-center flex-shrink-0">🍽️</div>
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-neutral-700 flex items-center justify-center shrink-0">🍽️</div>
                         )}
                         <span className="text-white font-medium text-sm md:text-base truncate">{dish.name}</span>
                       </div>
@@ -162,9 +162,9 @@ export default async function OrderDetailPage({
                     {desserts.map(({ dish }) => (
                       <div key={dish.id} className="flex items-center gap-3 p-2 md:p-3 bg-neutral-800 rounded-lg md:rounded-xl">
                         {dish.imageUrl ? (
-                          <img src={dish.imageUrl} alt={dish.name} className="w-10 h-10 md:w-12 md:h-12 rounded-lg object-cover flex-shrink-0" />
+                          <img src={dish.imageUrl} alt={dish.name} className="w-10 h-10 md:w-12 md:h-12 rounded-lg object-cover shrink-0" />
                         ) : (
-                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-neutral-700 flex items-center justify-center flex-shrink-0">🍽️</div>
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-neutral-700 flex items-center justify-center shrink-0">🍽️</div>
                         )}
                         <span className="text-white font-medium text-sm md:text-base truncate">{dish.name}</span>
                       </div>

@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Migrate to Blob",
+			"type": "shell",
+			"command": "npx tsx",
+			"args": [
+				"scripts/migrate-to-blob.ts"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		}
+	]
+}

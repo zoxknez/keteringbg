@@ -74,7 +74,7 @@ export default async function AdminDashboard() {
               <Link 
                 key={order.id} 
                 href={`/admin/orders/${order.id}`}
-                className="p-4 md:p-6 flex items-center justify-between hover:bg-neutral-800/50 transition-colors block"
+                className="p-4 md:p-6 flex items-center justify-between hover:bg-neutral-800/50 transition-colors"
               >
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-white truncate">{order.clientName}</p>

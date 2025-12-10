@@ -111,7 +111,7 @@ export default function AdminSidebar() {
                     : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
                 }`}
               >
-                <Icon className="w-5 h-5 flex-shrink-0" />
+                <Icon className="w-5 h-5 shrink-0" />
                 <span className="font-medium">{item.label}</span>
               </Link>
             )
@@ -131,7 +131,7 @@ export default function AdminSidebar() {
             onClick={() => signOut({ callbackUrl: '/admin/login' })}
             className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all"
           >
-            <LogOut className="w-5 h-5 flex-shrink-0" />
+            <LogOut className="w-5 h-5 shrink-0" />
             <span className="font-medium">Odjavi se</span>
           </button>
         </div>
