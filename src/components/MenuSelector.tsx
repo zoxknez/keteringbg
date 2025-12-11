@@ -2,7 +2,7 @@
 
 import { useState, useActionState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Check, ChevronRight, ArrowLeft, ChevronDown, Plus, Minus, ShoppingCart, Trash2, X } from 'lucide-react'
+import { Check, ChevronRight, ArrowLeft, ChevronDown, Plus, Minus, ShoppingCart, Trash2, X, Pencil } from 'lucide-react'
 import { submitOrder } from '@/app/actions'
 import Image from 'next/image'
 import { useTranslations, useLocale } from 'next-intl'
@@ -71,13 +71,16 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
   // Trenutno selektovani meni i jela
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null)
   const [selectedDishIds, setSelectedDishIds] = useState<string[]>([])
-  const [currentPortions, setCurrentPortions] = useState<number>(1)
+  const [currentPortions, setCurrentPortions] = useState<number>(5)
   
   // Porudžbina - lista stavki
   const [orderItems, setOrderItems] = useState<OrderItem[]>([])
   
   // Modal za potvrdu nakon dodavanja
   const [showAddedModal, setShowAddedModal] = useState(false)
+  
+  // ID stavke koja se edituje (null ako se ne edituje)
+  const [editingItemId, setEditingItemId] = useState<string | null>(null)
   
   // Filteri
   const [activeFilter, setActiveFilter] = useState<string>('ALL')
@@ -111,7 +114,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
     setSelectedMenu(menu)
     setStep('dishes')
     setSelectedDishIds([])
-    setCurrentPortions(1)
+    setCurrentPortions(5)
     setActiveFilter('ALL')
     setExpandedCategories([])
   }
@@ -120,33 +123,50 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
     if (selectedDishIds.includes(dishId)) {
       setSelectedDishIds(prev => prev.filter(id => id !== dishId))
     } else {
-      if (selectedMenu && selectedDishIds.length < selectedMenu.dishCount) {
-        setSelectedDishIds(prev => [...prev, dishId])
-      }
+      // Dozvoli neograničen broj jela
+      setSelectedDishIds(prev => [...prev, dishId])
     }
   }
 
-  // Dodaj u porudžbinu
+  // Dodaj u porudžbinu (ili ažuriraj ako se edituje)
   const addToOrder = () => {
-    if (!selectedMenu || selectedDishIds.length !== selectedMenu.dishCount) return
+    if (!selectedMenu || selectedDishIds.length === 0) return
 
     const selectedDishObjects = selectedMenu.dishes.filter(d => selectedDishIds.includes(d.id))
     
-    const newItem: OrderItem = {
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      menuId: selectedMenu.id,
-      menuName: selectedMenu.name,
-      menuPrice: selectedMenu.price,
-      dishCount: selectedMenu.dishCount,
-      selectedDishes: selectedDishObjects,
-      portions: currentPortions
-    }
+    if (editingItemId) {
+      // Ažuriraj postojeću stavku
+      setOrderItems(prev => prev.map(item => 
+        item.id === editingItemId 
+          ? {
+              ...item,
+              selectedDishes: selectedDishObjects,
+              portions: currentPortions
+            }
+          : item
+      ))
+      setEditingItemId(null)
+      setStep('order')
+      toast.success(tOrder('itemUpdated') || 'Stavka je ažurirana')
+    } else {
+      // Dodaj novu stavku
+      const newItem: OrderItem = {
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        menuId: selectedMenu.id,
+        menuName: selectedMenu.name,
+        menuPrice: selectedMenu.price,
+        dishCount: selectedMenu.dishCount,
+        selectedDishes: selectedDishObjects,
+        portions: currentPortions
+      }
 
-    setOrderItems(prev => [...prev, newItem])
-    setShowAddedModal(true) // Prikaži modal umesto direktnog prelaska
+      setOrderItems(prev => [...prev, newItem])
+      setShowAddedModal(true) // Prikaži modal umesto direktnog prelaska
+    }
+    
     setSelectedMenu(null)
     setSelectedDishIds([])
-    setCurrentPortions(1)
+    setCurrentPortions(5)
   }
 
   // Nastavi sa dodavanjem
@@ -166,12 +186,26 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
     setOrderItems(prev => prev.filter(item => item.id !== itemId))
   }
 
+  // Edituj stavku iz porudžbine
+  const editOrderItem = (item: OrderItem) => {
+    // Pronađi meni koji odgovara ovoj stavci
+    const menuToEdit = menus.find(m => m.id === item.menuId)
+    if (!menuToEdit) return
+    
+    setEditingItemId(item.id)
+    setSelectedMenu(menuToEdit)
+    setSelectedDishIds(item.selectedDishes.map(d => d.id))
+    setCurrentPortions(item.portions)
+    setStep('dishes')
+  }
+
   // Dodaj još jednu stavku
   const addMoreItems = () => {
     setStep('menu')
     setSelectedMenu(null)
     setSelectedDishIds([])
-    setCurrentPortions(1)
+    setCurrentPortions(5)
+    setEditingItemId(null)
   }
 
   const currentDishes = selectedMenu ? selectedMenu.dishes : []
@@ -412,21 +446,23 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                     {selectedMenu.name}
                   </span>
                   <div className="flex items-center gap-2">
-                    <div className="flex gap-1">
-                      {Array.from({ length: selectedMenu.dishCount }).map((_, i) => (
-                        <div 
-                          key={i} 
-                          className={`w-2 h-2 rounded-full transition-all duration-300 ${i < selectedDishIds.length ? 'bg-amber-500' : 'bg-neutral-700'}`} 
-                        />
-                      ))}
-                    </div>
                     <span className="text-sm font-bold text-white">
-                      {selectedDishIds.length}/{selectedMenu.dishCount}
+                      {selectedDishIds.length} {selectedDishIds.length === 1 ? t('dishSelected') : t('dishesSelected')}
                     </span>
                   </div>
                 </div>
 
                 <div className="w-24" /> {/* Spacer */}
+              </div>
+              
+              {/* Upozorenje o minimalnom broju porcija */}
+              <div className="px-6 py-3 bg-amber-500/10 border-t border-amber-500/20">
+                <p className="text-center text-sm text-amber-400 font-medium flex items-center justify-center gap-2">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {tOrder('minPortionsNotice')}
+                </p>
               </div>
             </div>
 
@@ -583,7 +619,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
 
             {/* Bottom Action Bar - Izbor porcija i dodavanje */}
             <AnimatePresence>
-              {selectedDishIds.length === selectedMenu.dishCount && (
+              {selectedDishIds.length > 0 && (
                 <motion.div
                   initial={{ y: 100, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -592,21 +628,25 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                 >
                   <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center gap-4">
                     {/* Porcije kontrola */}
-                    <div className="flex items-center gap-4 bg-white/5 rounded-xl px-4 py-3">
-                      <span className="text-neutral-400 text-sm font-medium">{tOrder('portions')}:</span>
-                      <button 
-                        onClick={() => setCurrentPortions(Math.max(1, currentPortions - 1))}
-                        className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all"
-                      >
-                        <Minus className="w-4 h-4" />
-                      </button>
-                      <span className="text-2xl font-bold text-white w-12 text-center">{currentPortions}</span>
-                      <button 
-                        onClick={() => setCurrentPortions(currentPortions + 1)}
-                        className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-4 bg-white/5 rounded-xl px-4 py-3">
+                        <span className="text-neutral-400 text-sm font-medium">{tOrder('portions')}:</span>
+                        <button 
+                          onClick={() => setCurrentPortions(Math.max(5, currentPortions - 1))}
+                          disabled={currentPortions <= 5}
+                          className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-white transition-all"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="text-2xl font-bold text-white w-12 text-center">{currentPortions}</span>
+                        <button 
+                          onClick={() => setCurrentPortions(currentPortions + 1)}
+                          className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <span className="text-xs text-amber-500/80 text-center">* {tOrder('minPortionsNotice')}</span>
                     </div>
 
                     {/* Cena */}
@@ -617,13 +657,22 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                       </p>
                     </div>
 
-                    {/* Dodaj dugme */}
+                    {/* Dodaj/Sačuvaj dugme */}
                     <button
                       onClick={addToOrder}
-                      className="w-full sm:w-auto px-8 py-4 bg-amber-500 text-black hover:bg-amber-400 rounded-xl font-bold text-sm uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-3"
+                      className={`w-full sm:w-auto px-8 py-4 ${editingItemId ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-amber-500 hover:bg-amber-400'} text-black rounded-xl font-bold text-sm uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-3`}
                     >
-                      <Plus className="w-5 h-5" />
-                      {tOrder('addToOrder')}
+                      {editingItemId ? (
+                        <>
+                          <Check className="w-5 h-5" />
+                          {tOrder('saveChanges')}
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-5 h-5" />
+                          {tOrder('addToOrder')}
+                        </>
+                      )}
                     </button>
                   </div>
                 </motion.div>
@@ -695,8 +744,16 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                               {(item.menuPrice * item.portions).toLocaleString()} {t('units.rsd')}
                             </span>
                             <button
+                              onClick={() => editOrderItem(item)}
+                              className="w-10 h-10 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 hover:text-amber-300 transition-all"
+                              title={tOrder('editItem')}
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
                               onClick={() => removeOrderItem(item.id)}
-                              className="w-10 h-10 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center text-red-400 hover:text-red-300 transition-all opacity-0 group-hover:opacity-100"
+                              className="w-10 h-10 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center text-red-400 hover:text-red-300 transition-all"
+                              title={tOrder('removeItem')}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>

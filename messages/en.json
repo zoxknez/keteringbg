@@ -42,6 +42,9 @@
     }
   },
   "Menu": {
+    "sectionLabel": "Our Menus",
+    "sectionTitle": "Choose Your Menu",
+    "sectionDescription": "Create the perfect menu for your occasion - from elegant cocktails to lavish feasts",
     "dishes": "Dishes",
     "description": "Perfect choice for small and medium celebrations. Includes appetizer, main course, and dessert.",
     "select": "Select Menu",
@@ -87,7 +90,9 @@
     },
     "available": "available",
     "open": "Open",
-    "close": "Close"
+    "close": "Close",
+    "dishSelected": "dish selected",
+    "dishesSelected": "dishes selected"
   },
   "Checkout": {
     "title": "Your Details",
@@ -131,7 +136,12 @@
     "addedMessage": "Would you like to add more meals or complete your order?",
     "currentTotal": "Currently in order",
     "addMoreItems": "Add more meals",
-    "finishOrder": "Complete order"
+    "finishOrder": "Complete order",
+    "minPortionsNotice": "Minimum order is 5 portions",
+    "editItem": "Edit dishes",
+    "removeItem": "Remove item",
+    "itemUpdated": "Item has been updated",
+    "saveChanges": "Save changes"
   },
   "Footer": {
     "rights": "All rights reserved.",

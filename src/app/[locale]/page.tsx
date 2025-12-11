@@ -9,6 +9,7 @@ export const revalidate = 3600 // Revalidate every hour
 
 export default async function Home() {
   const t = await getTranslations('Index')
+  const tMenu = await getTranslations('Menu')
   const menusData = await prisma.menu.findMany({
     orderBy: { price: 'asc' },
     include: { dishes: true }
@@ -112,9 +113,9 @@ export default async function Home() {
       <section id="menu" className="py-32 px-6 relative">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20 space-y-4">
-            <span className="text-xs font-semibold tracking-[0.3em] uppercase text-amber-500">Naši Meniji</span>
-            <h2 className="text-5xl md:text-6xl font-serif font-bold text-white">Izaberite Vaš Meni</h2>
-            <p className="text-neutral-500 max-w-xl mx-auto">Kreirajte savršen meni za vašu priliku - od elegantnih koktela do raskošnih gozbi</p>
+            <span className="text-xs font-semibold tracking-[0.3em] uppercase text-amber-500">{tMenu('sectionLabel')}</span>
+            <h2 className="text-5xl md:text-6xl font-serif font-bold text-white">{tMenu('sectionTitle')}</h2>
+            <p className="text-neutral-500 max-w-xl mx-auto">{tMenu('sectionDescription')}</p>
             
             <div className="pt-6 flex justify-center">
               <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-900/20 border border-amber-500/30 rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.1)] animate-pulse">

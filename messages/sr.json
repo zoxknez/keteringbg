@@ -42,6 +42,9 @@
     }
   },
   "Menu": {
+    "sectionLabel": "Naši Meniji",
+    "sectionTitle": "Izaberite Vaš Meni",
+    "sectionDescription": "Kreirajte savršen meni za vašu priliku - od elegantnih koktela do raskošnih gozbi",
     "dishes": "Jela",
     "description": "Idealan izbor za manje i srednje proslave. Uključuje predjelo, glavno jelo i dezert.",
     "select": "Izaberite Meni",
@@ -87,7 +90,9 @@
     },
     "available": "dostupno",
     "open": "Otvori",
-    "close": "Zatvori"
+    "close": "Zatvori",
+    "dishSelected": "jelo izabrano",
+    "dishesSelected": "jela izabrano"
   },
   "Checkout": {
     "title": "Vaši Podaci",
@@ -131,7 +136,12 @@
     "addedMessage": "Želite li da dodate još obroka ili da završite porudžbinu?",
     "currentTotal": "Trenutno u porudžbini",
     "addMoreItems": "Dodaj još obroka",
-    "finishOrder": "Završi porudžbinu"
+    "finishOrder": "Završi porudžbinu",
+    "minPortionsNotice": "Minimalna narudžbina je 5 porcija",
+    "editItem": "Izmeni jela",
+    "removeItem": "Ukloni stavku",
+    "itemUpdated": "Stavka je ažurirana",
+    "saveChanges": "Sačuvaj izmene"
   },
   "Footer": {
     "rights": "Sva prava zadržana.",
