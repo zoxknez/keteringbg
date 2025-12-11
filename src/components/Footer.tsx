@@ -99,7 +99,7 @@ export default async function Footer() {
           </p>
           <div className="flex items-center gap-4">
             <p className="text-xs text-neutral-600">
-              {t('createdWith')}
+              {t('designedBy')} <a href="https://mojportfolio.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors font-medium">o0o0o0o</a>
             </p>
             {/* Discreet Admin Link */}
             <Link 
