@@ -117,13 +117,21 @@ export default async function Home() {
             <h2 className="text-5xl md:text-6xl font-serif font-bold text-white">{tMenu('sectionTitle')}</h2>
             <p className="text-neutral-500 max-w-xl mx-auto">{tMenu('sectionDescription')}</p>
             
-            <div className="pt-6 flex justify-center">
-              <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-900/20 border border-amber-500/30 rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.1)] animate-pulse">
-                <svg className="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="pt-6 flex flex-col items-center gap-4">
+              <div className="inline-flex items-center gap-3 px-8 py-4 bg-amber-900/20 border border-amber-500/30 rounded-2xl shadow-[0_0_20px_rgba(245,158,11,0.15)]">
+                <svg className="w-6 h-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-sm font-bold text-amber-500 uppercase tracking-wider">
+                <span className="text-base font-bold text-amber-500 uppercase tracking-wider">
                   {t('hero.notice24h')}
+                </span>
+              </div>
+              <div className="inline-flex items-center gap-3 px-8 py-4 bg-emerald-900/20 border border-emerald-500/30 rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+                <svg className="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-base font-bold text-emerald-500 uppercase tracking-wider">
+                  {tMenu('minPortionsNoticeMain')}
                 </span>
               </div>
             </div>

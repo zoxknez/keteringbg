@@ -92,7 +92,8 @@
     "open": "Otvori",
     "close": "Zatvori",
     "dishSelected": "jelo izabrano",
-    "dishesSelected": "jela izabrano"
+    "dishesSelected": "jela izabrano",
+    "minPortionsNoticeMain": "* Minimalna narudžbina je 5 porcija po jelu"
   },
   "Checkout": {
     "title": "Vaši Podaci",

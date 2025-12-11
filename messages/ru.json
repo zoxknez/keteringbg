@@ -92,7 +92,8 @@
     "open": "Открыть",
     "close": "Закрыть",
     "dishSelected": "блюдо выбрано",
-    "dishesSelected": "блюд выбрано"
+    "dishesSelected": "блюд выбрано",
+    "minPortionsNoticeMain": "* Минимальный заказ - 5 порций на блюдо"
   },
   "Checkout": {
     "title": "Ваши Данные",

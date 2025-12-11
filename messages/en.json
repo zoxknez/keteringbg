@@ -92,7 +92,8 @@
     "open": "Open",
     "close": "Close",
     "dishSelected": "dish selected",
-    "dishesSelected": "dishes selected"
+    "dishesSelected": "dishes selected",
+    "minPortionsNoticeMain": "* Minimum order is 5 portions per dish"
   },
   "Checkout": {
     "title": "Your Details",

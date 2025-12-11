@@ -433,10 +433,10 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
             <div className="sticky top-4 z-40 bg-neutral-900/90 backdrop-blur-xl rounded-2xl border border-white/10 mx-auto max-w-4xl">
               <div className="px-6 py-4 flex items-center justify-between">
                 <button onClick={() => setStep(orderItems.length > 0 ? 'order' : 'menu')} className="flex items-center gap-3 group">
-                  <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-500 text-neutral-400 group-hover:text-black transition-all duration-300">
-                    <ArrowLeft className="w-4 h-4" />
+                  <div className="w-12 h-12 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center group-hover:bg-amber-500 text-amber-500 group-hover:text-black transition-all duration-300">
+                    <ArrowLeft className="w-5 h-5" />
                   </div>
-                  <span className="text-sm font-semibold text-neutral-500 group-hover:text-white transition-colors hidden sm:block">
+                  <span className="text-sm font-bold text-amber-500 group-hover:text-white transition-colors">
                     {t('back')}
                   </span>
                 </button>
@@ -826,10 +826,10 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
               <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-amber-400 to-amber-600" />
               
               <button onClick={() => setStep('order')} className="flex items-center gap-3 group mb-8">
-                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-500 text-slate-400 group-hover:text-slate-900 transition-all duration-300">
-                  <ArrowLeft className="w-4 h-4" />
+                <div className="w-12 h-12 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center group-hover:bg-amber-500 text-amber-500 group-hover:text-black transition-all duration-300">
+                  <ArrowLeft className="w-5 h-5" />
                 </div>
-                <span className="text-sm font-semibold text-neutral-500 group-hover:text-white transition-colors">
+                <span className="text-sm font-bold text-amber-500 group-hover:text-white transition-colors">
                   {tOrder('backToOrder')}
                 </span>
               </button>
