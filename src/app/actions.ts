@@ -92,10 +92,11 @@ export async function submitOrder(prevState: { success: boolean; message: string
       console.log('Customer:', clientName, clientPhone, clientEmail)
       console.log('Order items:', orderData.items.length)
       console.log('Total:', orderData.totalPrice, 'RSD')
+      console.log('API Key exists:', !!process.env.RESEND_API_KEY)
       console.log('API Key prefix:', process.env.RESEND_API_KEY?.substring(0, 10) + '...')
       
       // 1. Email to Admin
-      await resend.emails.send({
+      const adminEmailResult = await resend.emails.send({
         from: 'Ketering Beograd <onboarding@resend.dev>',
         to: ['spalevic.dragan@gmail.com'],
         replyTo: clientEmail,
@@ -182,9 +183,11 @@ export async function submitOrder(prevState: { success: boolean; message: string
           </div>
         `
       })
+      
+      console.log('Admin email result:', JSON.stringify(adminEmailResult, null, 2))
 
       // 2. Email to Client (Confirmation)
-      await resend.emails.send({
+      const clientEmailResult = await resend.emails.send({
         from: 'Ketering Beograd <onboarding@resend.dev>',
         to: [clientEmail],
         subject: '✅ Primili smo vašu porudžbinu - Ketering Beograd',
@@ -241,11 +244,17 @@ export async function submitOrder(prevState: { success: boolean; message: string
         `
       })
 
-      console.log('Emails sent successfully')
+      console.log('Client email result:', JSON.stringify(clientEmailResult, null, 2))
+      console.log('Both emails sent successfully')
     } catch (emailError: unknown) {
-      const error = emailError as { message?: string }
-      console.error('Failed to send email:', error?.message || emailError)
+      const error = emailError as { message?: string; statusCode?: number; name?: string }
+      console.error('=== EMAIL ERROR ===')
+      console.error('Error name:', error?.name)
+      console.error('Error message:', error?.message)
+      console.error('Status code:', error?.statusCode)
       console.error('Full error:', JSON.stringify(emailError, null, 2))
+      // Ne vraćamo grešku korisniku jer je porudžbina uspešno primljena
+      // Email se može poslati i naknadno
     }
 
     return { success: true, message: 'Vaša porudžbina je uspešno poslata!' }

@@ -36,13 +36,19 @@ export default function MediaUpload({ value, onChange, type = 'image', label }: 
         body: formData,
       })
 
-      if (!response.ok) throw new Error('Upload failed')
-      
       const data = await response.json()
+      
+      if (!response.ok) {
+        console.error('Upload failed:', data)
+        throw new Error(data.error || 'Upload failed')
+      }
+      
       onChange(data.url)
+      toast.success('Fajl uspešno učitan')
     } catch (error) {
       console.error('Upload error:', error)
-      toast.error('Greška pri upload-u')
+      const message = error instanceof Error ? error.message : 'Upload failed'
+      toast.error(`Greška pri upload-u: ${message}`)
     } finally {
       setUploading(false)
     }

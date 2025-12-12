@@ -30,16 +30,25 @@ export async function POST(req: NextRequest) {
     }
 
     // Upload to Vercel Blob
-    // We use the type as a folder prefix
-    const filename = `${type}/${file.name}`
+    // Generate unique filename with timestamp to prevent conflicts
+    const timestamp = Date.now()
+    const randomId = Math.random().toString(36).substring(2, 8)
+    const ext = file.name.split('.').pop() || ''
+    const baseName = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9-_]/g, '-')
+    const uniqueFilename = `${type}/${baseName}-${timestamp}-${randomId}.${ext}`
     
-    const blob = await put(filename, file, {
+    console.log('Uploading file:', uniqueFilename, 'Size:', file.size, 'Type:', file.type)
+    
+    const blob = await put(uniqueFilename, file, {
       access: 'public',
+      addRandomSuffix: false, // We already added unique suffix
     })
 
+    console.log('Upload successful:', blob.url)
     return NextResponse.json({ url: blob.url, filename: blob.pathname })
   } catch (error) {
     console.error('Upload error:', error)
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : 'Upload failed'
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
