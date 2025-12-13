@@ -184,7 +184,11 @@ export async function submitOrder(prevState: { success: boolean; message: string
         `
       })
       
-      console.log('Admin email result:', JSON.stringify(adminEmailResult, null, 2))
+      if (adminEmailResult.error) {
+        console.error('Admin email failed:', adminEmailResult.error)
+        throw new Error(`Admin email failed: ${adminEmailResult.error.message}`)
+      }
+      console.log('Admin email sent:', adminEmailResult.data)
 
       // 2. Email to Client (Confirmation)
       const clientEmailResult = await resend.emails.send({
@@ -244,7 +248,12 @@ export async function submitOrder(prevState: { success: boolean; message: string
         `
       })
 
-      console.log('Client email result:', JSON.stringify(clientEmailResult, null, 2))
+      if (clientEmailResult.error) {
+        console.error('Client email failed:', clientEmailResult.error)
+        // Don't throw here, as admin email was sent successfully
+      } else {
+        console.log('Client email sent:', clientEmailResult.data)
+      }
       console.log('Both emails sent successfully')
     } catch (emailError: unknown) {
       const error = emailError as { message?: string; statusCode?: number; name?: string }

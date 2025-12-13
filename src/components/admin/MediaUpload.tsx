@@ -63,7 +63,10 @@ export default function MediaUpload({ value, onChange, type = 'image', label }: 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) handleUpload(file)
+    if (file) {
+      handleUpload(file)
+      e.target.value = ''
+    }
   }
 
   const isVideo = value?.includes('.mp4') || value?.includes('.webm')
