@@ -81,11 +81,19 @@ export default async function Footer() {
           {/* Info */}
           <div className="space-y-6">
             <h4 className="text-sm font-bold uppercase tracking-widest text-white">{t('info')}</h4>
-            <div className="space-y-2 text-sm">
+            <div className="space-y-3 text-sm">
               <p className="font-medium text-white">Dragan Spalević PR</p>
               <p className="text-neutral-500">{t('cateringBelgrade')}</p>
               <p className="text-neutral-500">PIB: 114970001</p>
               <p className="text-neutral-500">MB: 67992032</p>
+              <div className="pt-2">
+                <Link 
+                  href="/blog" 
+                  className="text-amber-500 hover:text-amber-400 transition-colors font-medium"
+                >
+                  Blog →
+                </Link>
+              </div>
             </div>
           </div>
         </div>

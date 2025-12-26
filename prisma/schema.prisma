@@ -87,12 +87,13 @@ enum OrderStatus {
 
 // Admin user for authentication
 model Admin {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String   // hashed password
+  id        String     @id @default(cuid())
+  email     String     @unique
+  password  String     // hashed password
   name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  blogPosts BlogPost[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now()) @updatedAt
 }
 
 // Site settings/content management
@@ -108,5 +109,69 @@ model SiteSettings {
   googleMapsUrl String   @default("")
   footerText    String   @default("")
   updatedAt     DateTime @default(now()) @updatedAt
+}
+
+// Blog post model with video embedding support
+model BlogPost {
+  id          String       @id @default(cuid())
+  title       String
+  slug        String       @unique
+  excerpt     String?
+  content     String       @db.Text
+  coverImage  String?
+  isPublished Boolean      @default(false)
+  publishedAt DateTime?
+  category    BlogCategory @default(NEWS)
+  tags        String[]     @default([])
+  
+  // Video embeds from various platforms
+  videoEmbeds VideoEmbed[]
+  
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+  
+  // Author (reference to Admin)
+  authorId  String
+  author    Admin  @relation(fields: [authorId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  
+  @@index([slug])
+  @@index([isPublished])
+  @@index([publishedAt])
+}
+
+// Video embeds for blog posts
+model VideoEmbed {
+  id         String         @id @default(cuid())
+  platform   VideoPlatform
+  videoId    String         // ID or URL specific to the platform
+  title      String?
+  position   Int            @default(0) // Order in the blog post
+  
+  blogPostId String
+  blogPost   BlogPost       @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+  
+  createdAt  DateTime       @default(now())
+  
+  @@index([blogPostId])
+}
+
+enum BlogCategory {
+  NEWS         // Vesti
+  RECIPES      // Recepti
+  EVENTS       // Događaji
+  TIPS         // Saveti
+  BEHIND_SCENES // Iza kulisa
+}
+
+enum VideoPlatform {
+  YOUTUBE
+  TIKTOK
+  INSTAGRAM
+  VIMEO
+  FACEBOOK
 }
 

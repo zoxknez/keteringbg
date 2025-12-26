@@ -79,7 +79,9 @@
     "menuDetails": {
       "menu1": "500g Portion + Bread + Salad",
       "menu2": "500g Portion + Bread + Salad + Soup/Stew",
-      "menu3": "500g Portion + Bread + Salad + Soup/Stew + Dessert"
+      "menu3": "500g Portion + Bread + Salad + Soup/Stew + Dessert",
+      "menu4": "500g Portion + Bread + Salad + Soup/Stew + Dessert + Drink",
+      "menu5": "600g Portion + Bread + Salad + Soup/Stew + Dessert + Drink"
     },
     "units": {
       "rsd": "RSD",
@@ -161,5 +163,22 @@
     "video": "Video",
     "viewAll": "View All Images",
     "dishAlt": "Dish"
+  },
+  "Blog": {
+    "title": "Blog",
+    "subtitle": "Recipes, tips and stories from our catering world",
+    "allCategories": "All Categories",
+    "readMore": "Read More",
+    "backToBlog": "Back to Blog",
+    "readingTime": "min read",
+    "videoContent": "Video Content",
+    "noPosts": "No published posts yet.",
+    "categories": {
+      "NEWS": "News",
+      "RECIPES": "Recipes",
+      "EVENTS": "Events",
+      "TIPS": "Tips",
+      "BEHIND_SCENES": "Behind the Scenes"
+    }
   }
 }

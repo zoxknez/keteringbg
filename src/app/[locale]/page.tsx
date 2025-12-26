@@ -71,6 +71,17 @@ export default async function Home() {
                 {t('hero.ctaGallery')}
               </span>
             </a>
+            <a 
+              href="/blog" 
+              className="group px-10 py-5 bg-white/5 text-white rounded-full font-semibold text-sm uppercase tracking-widest border border-white/20 hover:bg-white/10 hover:border-blue-500/50 transition-all duration-500"
+            >
+              <span className="flex items-center justify-center gap-3">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 5c7.18 0 13 5.82 13 13M6 11a7 7 0 017 7m-6 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                </svg>
+                Blog
+              </span>
+            </a>
             <CorporateOffer />
             <ContactButton />
           </div>

@@ -14,7 +14,8 @@ import {
   CheckCircle,
   ShoppingCart,
   Menu,
-  X
+  X,
+  FileText
 } from 'lucide-react'
 
 const navItems = [
@@ -22,6 +23,7 @@ const navItems = [
   { href: '/admin/orders', label: 'Narudžbine', icon: ShoppingCart },
   { href: '/admin/dishes', label: 'Jela', icon: UtensilsCrossed },
   { href: '/admin/menus', label: 'Meniji', icon: BookOpen },
+  { href: '/admin/blog', label: 'Blog', icon: FileText },
   { href: '/admin/availability', label: 'Dostupnost', icon: CheckCircle },
   { href: '/admin/media', label: 'Mediji', icon: Image },
   { href: '/admin/settings', label: 'Podešavanja', icon: Settings },

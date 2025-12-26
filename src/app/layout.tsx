@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Toaster } from 'sonner';
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,10 +12,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="sr">
-      <body>
+    <html suppressHydrationWarning>
+      <body suppressHydrationWarning>
         {children}
-        <Toaster position="top-center" richColors />
       </body>
     </html>
   );

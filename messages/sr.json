@@ -79,7 +79,9 @@
     "menuDetails": {
       "menu1": "Porcija 500g + hleb + salata",
       "menu2": "Porcija 500g + hleb + salata + supa/čorba",
-      "menu3": "Porcija 500g + hleb + salata + supa/čorba + desert"
+      "menu3": "Porcija 500g + hleb + salata + supa/čorba + desert",
+      "menu4": "Porcija 500g + hleb + salata + supa/čorba + desert + piće",
+      "menu5": "Porcija 600g + hleb + salata + supa/čorba + desert + piće"
     },
     "units": {
       "rsd": "RSD",
@@ -160,6 +162,21 @@
     "description": "Svako jelo pripremamo sa ljubavlju i pažnjom, koristeći samo najsvežije sastojke.",
     "video": "Video",
     "viewAll": "Pogledajte Sve Slike",
-    "dishAlt": "Jelo"
-  }
+    "dishAlt": "Jelo"  },
+  "Blog": {
+    "title": "Blog",
+    "subtitle": "Recepti, saveti i priče iz našeg ketering sveta",
+    "allCategories": "Sve kategorije",
+    "readMore": "Pročitaj više",
+    "backToBlog": "Nazad na blog",
+    "readingTime": "min čitanja",
+    "videoContent": "Video Sadržaj",
+    "noPosts": "Trenutno nema objavljenih postova.",
+    "categories": {
+      "NEWS": "Vesti",
+      "RECIPES": "Recepti",
+      "EVENTS": "Događaji",
+      "TIPS": "Saveti",
+      "BEHIND_SCENES": "Iza kulisa"
+    }  }
 }
