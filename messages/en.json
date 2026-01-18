@@ -173,6 +173,10 @@
     "readingTime": "min read",
     "videoContent": "Video Content",
     "noPosts": "No published posts yet.",
+    "featured": "Featured",
+    "searchPlaceholder": "Search posts...",
+    "noResults": "No posts found matching your search",
+    "moreFrom": "More from",
     "categories": {
       "NEWS": "News",
       "RECIPES": "Recipes",

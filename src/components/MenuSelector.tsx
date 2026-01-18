@@ -64,28 +64,28 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
   const tCheckout = useTranslations('Checkout')
   const tOrder = useTranslations('Order')
   const locale = useLocale()
-  
+
   // Koraci: menu -> dishes -> order -> checkout -> success
   const [step, setStep] = useState<'menu' | 'dishes' | 'order' | 'checkout' | 'success'>('menu')
-  
+
   // Trenutno selektovani meni i jela
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null)
   const [selectedDishIds, setSelectedDishIds] = useState<string[]>([])
   const [currentPortions, setCurrentPortions] = useState<number>(5)
-  
+
   // Porudžbina - lista stavki
   const [orderItems, setOrderItems] = useState<OrderItem[]>([])
-  
+
   // Modal za potvrdu nakon dodavanja
   const [showAddedModal, setShowAddedModal] = useState(false)
-  
+
   // ID stavke koja se edituje (null ako se ne edituje)
   const [editingItemId, setEditingItemId] = useState<string | null>(null)
-  
+
   // Filteri
   const [activeFilter, setActiveFilter] = useState<string>('ALL')
   const [expandedCategories, setExpandedCategories] = useState<string[]>([])
-  
+
   const [state, formAction] = useActionState(submitOrder, initialState)
 
   useEffect(() => {
@@ -103,8 +103,8 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
   const totalPortions = orderItems.reduce((sum, item) => sum + item.portions, 0)
 
   const toggleCategory = (category: string) => {
-    setExpandedCategories(prev => 
-      prev.includes(category) 
+    setExpandedCategories(prev =>
+      prev.includes(category)
         ? prev.filter(c => c !== category)
         : [...prev, category]
     )
@@ -133,16 +133,16 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
     if (!selectedMenu || selectedDishIds.length === 0) return
 
     const selectedDishObjects = selectedMenu.dishes.filter(d => selectedDishIds.includes(d.id))
-    
+
     if (editingItemId) {
       // Ažuriraj postojeću stavku
-      setOrderItems(prev => prev.map(item => 
-        item.id === editingItemId 
+      setOrderItems(prev => prev.map(item =>
+        item.id === editingItemId
           ? {
-              ...item,
-              selectedDishes: selectedDishObjects,
-              portions: currentPortions
-            }
+            ...item,
+            selectedDishes: selectedDishObjects,
+            portions: currentPortions
+          }
           : item
       ))
       setEditingItemId(null)
@@ -163,7 +163,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
       setOrderItems(prev => [...prev, newItem])
       setShowAddedModal(true) // Prikaži modal umesto direktnog prelaska
     }
-    
+
     setSelectedMenu(null)
     setSelectedDishIds([])
     setCurrentPortions(5)
@@ -191,7 +191,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
     // Pronađi meni koji odgovara ovoj stavci
     const menuToEdit = menus.find(m => m.id === item.menuId)
     if (!menuToEdit) return
-    
+
     setEditingItemId(item.id)
     setSelectedMenu(menuToEdit)
     setSelectedDishIds(item.selectedDishes.map(d => d.id))
@@ -271,12 +271,12 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
 
       <AnimatePresence>
         {state.success && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="bg-neutral-900 border border-white/10 p-8 md:p-12 rounded-3xl text-center max-w-lg w-full shadow-2xl shadow-amber-500/20 relative"
@@ -286,8 +286,8 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
               </div>
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-4">{tCheckout('successTitle')}</h2>
               <p className="text-neutral-400 text-lg mb-10 leading-relaxed">{tCheckout('successMessage')}</p>
-              
-              <button 
+
+              <button
                 onClick={() => window.location.reload()}
                 className="w-full py-4 bg-amber-500 text-black hover:bg-amber-400 rounded-xl font-semibold text-sm uppercase tracking-widest transition-all duration-300 shadow-lg hover:shadow-amber-500/25"
               >
@@ -301,13 +301,13 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
       {/* Modal - Dodato u porudžbinu */}
       <AnimatePresence>
         {showAddedModal && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -317,7 +317,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
               <div className="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-500/30">
                 <Check className="w-10 h-10 text-amber-500" />
               </div>
-              
+
               <h2 className="text-2xl md:text-3xl font-serif font-bold text-white mb-3">
                 {tOrder('addedTitle')}
               </h2>
@@ -332,16 +332,16 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                   {orderItems.length} {orderItems.length === 1 ? tOrder('item') : tOrder('items')} • {totalPrice.toLocaleString()} {t('units.rsd')}
                 </p>
               </div>
-              
+
               <div className="flex flex-col gap-3">
-                <button 
+                <button
                   onClick={continueOrdering}
                   className="w-full py-4 bg-white/10 text-white hover:bg-white/20 rounded-xl font-semibold text-sm uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
                   {tOrder('addMoreItems')}
                 </button>
-                <button 
+                <button
                   onClick={finishOrdering}
                   className="w-full py-4 bg-amber-500 text-black hover:bg-amber-400 rounded-xl font-semibold text-sm uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2"
                 >
@@ -357,7 +357,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
       <AnimatePresence mode="wait">
         {/* KORAK 1: Izbor menija */}
         {step === 'menu' && (
-          <motion.div 
+          <motion.div
             key="menu"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -366,46 +366,46 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
             className="grid md:grid-cols-3 gap-6"
           >
             {menus.map((menu, index) => (
-              <motion.div 
+              <motion.div
                 key={menu.id}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                 onClick={() => handleMenuSelect(menu)}
-                className="group relative bg-neutral-900/60 backdrop-blur rounded-3xl p-8 md:p-10 cursor-pointer overflow-hidden border border-white/5 hover:border-amber-500/30 transition-all duration-500 hover:-translate-y-2"
+                className="group relative bg-neutral-900/40 backdrop-blur-md rounded-[2.5rem] p-8 md:p-10 cursor-pointer overflow-hidden border border-white/5 hover:border-amber-500/30 transition-all duration-500 hover:-translate-y-2 flex flex-col min-h-[500px] shadow-2xl shadow-black/50"
               >
                 {/* Badge */}
-                <div className="flex items-center justify-between mb-8">
-                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full text-xs font-bold uppercase tracking-widest text-neutral-500">
-                    <span className="w-2 h-2 bg-amber-500 rounded-full" />
+                <div className="flex items-center justify-between mb-8 shrink-0">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400 border border-white/5">
+                    <span className="w-1.5 h-1.5 bg-amber-500 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
                     {t('menuLabel')} {index + 1}
                   </span>
                   {index === 1 && (
-                    <span className="px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-wider rounded-full">
+                    <span className="px-4 py-1.5 bg-linear-to-r from-amber-500 to-amber-600 text-black text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-amber-500/20">
                       {t('popular')}
                     </span>
                   )}
                 </div>
 
                 {/* Main Content */}
-                <div className="space-y-6">
-                  <h3 className="text-3xl md:text-4xl font-serif font-bold text-white group-hover:text-amber-400 transition-colors duration-300">
+                <div className="flex flex-col flex-1">
+                  <h3 className="text-3xl md:text-4xl font-serif font-bold text-white group-hover:text-amber-400 transition-colors duration-300 leading-tight mb-4">
                     {menu.name}
                   </h3>
-                  
+
                   {/* Cena */}
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-serif font-bold text-amber-500">{menu.price}</span>
-                    <span className="text-lg font-medium text-neutral-500">{t('units.rsd')}</span>
-                    <span className="text-sm text-neutral-600 ml-2">{t('units.portion')}</span>
+                  <div className="flex items-baseline gap-1 mb-6">
+                    <span className="text-5xl font-serif font-bold text-amber-500 text-glow-amber">{menu.price}</span>
+                    <span className="text-lg font-medium text-neutral-500 ml-1">{t('units.rsd')}</span>
+                    <span className="text-[10px] uppercase tracking-widest text-neutral-600 ml-2 font-bold">{t('units.portion')}</span>
                   </div>
 
-                  <p className="text-neutral-500 leading-relaxed text-sm">
+                  <p className="text-neutral-400 leading-relaxed text-sm font-light flex-1">
                     {t(`menuDetails.menu${index + 1}`)}
                   </p>
 
-                  <div className="pt-4">
-                    <button className="w-full py-4 bg-amber-500 text-black rounded-2xl font-semibold text-sm uppercase tracking-widest group-hover:bg-amber-400 transition-all duration-300 flex items-center justify-center gap-3">
+                  <div className="pt-8 shrink-0">
+                    <button className="w-full py-5 bg-amber-500 text-black rounded-2xl font-bold text-xs uppercase tracking-[0.2em] group-hover:bg-amber-400 transition-all duration-300 flex items-center justify-center gap-3 shadow-xl shadow-amber-500/10 group-hover:shadow-amber-500/25">
                       {t('select')}
                       <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </button>
@@ -413,7 +413,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                 </div>
 
                 {/* Decorative */}
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-linear-to-br from-amber-500/30 to-amber-500/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-2xl" />
+                <div className="absolute -top-20 -right-20 w-64 h-64 bg-amber-500/5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-[80px]" />
               </motion.div>
             ))}
           </motion.div>
@@ -454,7 +454,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
 
                 <div className="w-24" /> {/* Spacer */}
               </div>
-              
+
               {/* Upozorenje o minimalnom broju porcija */}
               <div className="px-6 py-3 bg-amber-500/10 border-t border-amber-500/20">
                 <p className="text-center text-sm text-amber-400 font-medium flex items-center justify-center gap-2">
@@ -470,11 +470,10 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
             <div className="flex flex-wrap justify-center gap-2 pb-4">
               <button
                 onClick={() => setActiveFilter('ALL')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                  activeFilter === 'ALL' 
-                    ? 'bg-amber-500 text-black' 
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeFilter === 'ALL'
+                    ? 'bg-amber-500 text-black'
                     : 'bg-white/5 text-neutral-400 hover:bg-white/10 hover:text-white'
-                }`}
+                  }`}
               >
                 🍽️ {t('filters.all')}
               </button>
@@ -485,11 +484,10 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                   <button
                     key={key}
                     onClick={() => setActiveFilter(key)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-                      activeFilter === key 
-                        ? `${config.bgColor} ${config.color} ring-2 ring-current` 
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${activeFilter === key
+                        ? `${config.bgColor} ${config.color} ring-2 ring-current`
                         : 'bg-white/5 text-neutral-400 hover:bg-white/10 hover:text-white'
-                    }`}
+                      }`}
                   >
                     <span>{config.icon}</span>
                     <span className="hidden sm:inline">{config.label}</span>
@@ -507,114 +505,115 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                 const config = categoryConfig[category]
                 const isExpanded = expandedCategories.includes(category)
                 const selectedInCategory = categoryDishes.filter(d => selectedDishIds.includes(d.id)).length
-                
-                return (
-                <div key={category} className="space-y-4">
-                  {/* Category Header - Clickable */}
-                  <button 
-                    onClick={() => toggleCategory(category)}
-                    className={`w-full flex items-center gap-4 p-4 rounded-2xl ${config.bgColor} border border-white/5 hover:border-white/20 transition-all duration-300 cursor-pointer group`}
-                  >
-                    <div className={`w-14 h-14 rounded-xl ${config.bgColor} flex items-center justify-center text-3xl transition-transform duration-300 ${isExpanded ? 'scale-110' : ''}`}>
-                      {config.icon}
-                    </div>
-                    <div className="flex-1 text-left">
-                      <h3 className={`text-xl font-serif font-bold ${config.color} flex items-center gap-2`}>
-                        {config.label}
-                        {selectedInCategory > 0 && (
-                          <span className="px-2 py-0.5 bg-amber-500 text-black text-xs font-bold rounded-full">
-                            {selectedInCategory} {t('selected')}
-                          </span>
-                        )}
-                      </h3>
-                      <p className="text-neutral-500 text-sm">{categoryDishes.length} {t('dishes')} {t('available')}</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="hidden sm:block text-neutral-600 text-sm">
-                        {isExpanded ? t('close') : t('open')}
-                      </span>
-                      <div className={`w-10 h-10 rounded-full ${isExpanded ? 'bg-amber-500 text-black' : 'bg-white/10 text-white'} flex items-center justify-center transition-all duration-300`}>
-                        <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
-                      </div>
-                    </div>
-                  </button>
-                  
-                  {/* Collapsible Content */}
-                  <AnimatePresence>
-                    {isExpanded && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        className="overflow-hidden"
-                      >
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-2">
-                          {categoryDishes.map((dish) => (
-                            <motion.div 
-                              layout
-                              initial={{ opacity: 0, scale: 0.9 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ duration: 0.2 }}
-                              key={dish.id}
-                              onClick={() => toggleDish(dish.id)}
-                              whileHover={{ y: -5 }}
-                              whileTap={{ scale: 0.98 }}
-                              className={`group cursor-pointer bg-neutral-900/60 backdrop-blur rounded-2xl overflow-hidden transition-all duration-300 border-2 ${selectedDishIds.includes(dish.id) ? 'border-amber-500' : 'border-white/5 hover:border-white/10'}`}
-                            >
-                              <div className="relative aspect-4/3 overflow-hidden">
-                                <Image 
-                                  src={dish.imageUrl || ''} 
-                                  alt={dish.name}
-                                  fill
-                                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                                
-                                {/* Tags */}
-                                {dish.tags && dish.tags.length > 0 && (
-                                  <div className="absolute top-3 left-3 flex flex-wrap gap-1">
-                                    {dish.tags.map((tag) => (
-                                      <span 
-                                        key={tag} 
-                                        className="px-2 py-1 bg-black/70 backdrop-blur-sm rounded-full text-xs font-medium text-white flex items-center gap-1"
-                                        title={t(`tags.${tag}`)}
-                                      >
-                                        <span>{tagEmojis[tag] || '🍽️'}</span>
-                                      </span>
-                                    ))}
-                                    {dish.isFasting && !dish.tags.includes('FASTING') && (
-                                      <span 
-                                        className="px-2 py-1 bg-emerald-600/80 backdrop-blur-sm rounded-full text-xs font-medium text-white flex items-center gap-1"
-                                        title={t('tags.FASTING')}
-                                      >
-                                        <span>✝️</span>
-                                      </span>
-                                    )}
-                                  </div>
-                                )}
-                                
-                                {/* Selection Badge */}
-                                <div className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${selectedDishIds.includes(dish.id) ? 'bg-amber-500 scale-100' : 'bg-black/80 scale-0 group-hover:scale-100'}`}>
-                                  <Check className={`w-4 h-4 ${selectedDishIds.includes(dish.id) ? 'text-black' : 'text-neutral-400'}`} />
-                                </div>
-                              </div>
 
-                              <div className="p-4">
-                                <h4 className={`font-bold text-lg transition-colors duration-300 ${selectedDishIds.includes(dish.id) ? 'text-amber-400' : 'text-white'}`}>
-                                  {dish.name}
-                                </h4>
-                                <p className="text-sm text-neutral-600 mt-1 line-clamp-2">
-                                  {dish.description || t('dishDescription')}
-                                </p>
-                              </div>
-                            </motion.div>
-                          ))}
+                return (
+                  <div key={category} className="space-y-4">
+                    {/* Category Header - Clickable */}
+                    <button
+                      onClick={() => toggleCategory(category)}
+                      className={`w-full flex items-center gap-4 p-4 rounded-2xl ${config.bgColor} border border-white/5 hover:border-white/20 transition-all duration-300 cursor-pointer group`}
+                    >
+                      <div className={`w-14 h-14 rounded-xl ${config.bgColor} flex items-center justify-center text-3xl transition-transform duration-300 ${isExpanded ? 'scale-110' : ''}`}>
+                        {config.icon}
+                      </div>
+                      <div className="flex-1 text-left">
+                        <h3 className={`text-xl font-serif font-bold ${config.color} flex items-center gap-2`}>
+                          {config.label}
+                          {selectedInCategory > 0 && (
+                            <span className="px-2 py-0.5 bg-amber-500 text-black text-xs font-bold rounded-full">
+                              {selectedInCategory} {t('selected')}
+                            </span>
+                          )}
+                        </h3>
+                        <p className="text-neutral-500 text-sm">{categoryDishes.length} {t('dishes')} {t('available')}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="hidden sm:block text-neutral-600 text-sm">
+                          {isExpanded ? t('close') : t('open')}
+                        </span>
+                        <div className={`w-10 h-10 rounded-full ${isExpanded ? 'bg-amber-500 text-black' : 'bg-white/10 text-white'} flex items-center justify-center transition-all duration-300`}>
+                          <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )})}
+                      </div>
+                    </button>
+
+                    {/* Collapsible Content */}
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3, ease: 'easeInOut' }}
+                          className="overflow-hidden"
+                        >
+                          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-2">
+                            {categoryDishes.map((dish) => (
+                              <motion.div
+                                layout
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.2 }}
+                                key={dish.id}
+                                onClick={() => toggleDish(dish.id)}
+                                whileHover={{ y: -5 }}
+                                whileTap={{ scale: 0.98 }}
+                                className={`group cursor-pointer bg-neutral-900/60 backdrop-blur rounded-2xl overflow-hidden transition-all duration-300 border-2 ${selectedDishIds.includes(dish.id) ? 'border-amber-500' : 'border-white/5 hover:border-white/10'}`}
+                              >
+                                <div className="relative aspect-4/3 overflow-hidden">
+                                  <Image
+                                    src={dish.imageUrl || ''}
+                                    alt={dish.name}
+                                    fill
+                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                  />
+
+                                  {/* Tags */}
+                                  {dish.tags && dish.tags.length > 0 && (
+                                    <div className="absolute top-3 left-3 flex flex-wrap gap-1">
+                                      {dish.tags.map((tag) => (
+                                        <span
+                                          key={tag}
+                                          className="px-2 py-1 bg-black/70 backdrop-blur-sm rounded-full text-xs font-medium text-white flex items-center gap-1"
+                                          title={t(`tags.${tag}`)}
+                                        >
+                                          <span>{tagEmojis[tag] || '🍽️'}</span>
+                                        </span>
+                                      ))}
+                                      {dish.isFasting && !dish.tags.includes('FASTING') && (
+                                        <span
+                                          className="px-2 py-1 bg-emerald-600/80 backdrop-blur-sm rounded-full text-xs font-medium text-white flex items-center gap-1"
+                                          title={t('tags.FASTING')}
+                                        >
+                                          <span>✝️</span>
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+
+                                  {/* Selection Badge */}
+                                  <div className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${selectedDishIds.includes(dish.id) ? 'bg-amber-500 scale-100' : 'bg-black/80 scale-0 group-hover:scale-100'}`}>
+                                    <Check className={`w-4 h-4 ${selectedDishIds.includes(dish.id) ? 'text-black' : 'text-neutral-400'}`} />
+                                  </div>
+                                </div>
+
+                                <div className="p-4">
+                                  <h4 className={`font-bold text-lg transition-colors duration-300 ${selectedDishIds.includes(dish.id) ? 'text-amber-400' : 'text-white'}`}>
+                                    {dish.name}
+                                  </h4>
+                                  <p className="text-sm text-neutral-600 mt-1 line-clamp-2">
+                                    {dish.description || t('dishDescription')}
+                                  </p>
+                                </div>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )
+              })}
             </div>
 
             {/* Bottom Action Bar - Izbor porcija i dodavanje */}
@@ -631,7 +630,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-4 bg-white/5 rounded-xl px-4 py-3">
                         <span className="text-neutral-400 text-sm font-medium">{tOrder('portions')}:</span>
-                        <button 
+                        <button
                           onClick={() => setCurrentPortions(Math.max(5, currentPortions - 1))}
                           disabled={currentPortions <= 5}
                           className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-white transition-all"
@@ -639,7 +638,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                           <Minus className="w-4 h-4" />
                         </button>
                         <span className="text-2xl font-bold text-white w-12 text-center">{currentPortions}</span>
-                        <button 
+                        <button
                           onClick={() => setCurrentPortions(currentPortions + 1)}
                           className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all"
                         >
@@ -694,7 +693,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
             <div className="bg-neutral-900/80 backdrop-blur-xl rounded-3xl p-6 md:p-10 border border-white/10 relative overflow-hidden">
               {/* Decorative accent */}
               <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-amber-400 to-amber-600" />
-              
+
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl md:text-3xl font-serif font-bold text-white flex items-center gap-3">
                   <ShoppingCart className="w-8 h-8 text-amber-500" />
@@ -759,11 +758,11 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                             </button>
                           </div>
                         </div>
-                        
+
                         {/* Jela */}
                         <div className="flex flex-wrap gap-2">
                           {item.selectedDishes.map(dish => (
-                            <span 
+                            <span
                               key={dish.id}
                               className="px-3 py-1 bg-white/5 rounded-lg text-sm text-neutral-400 flex items-center gap-1"
                             >
@@ -824,7 +823,7 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
             <div className="bg-neutral-900/80 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-white/10 relative overflow-hidden">
               {/* Decorative accent */}
               <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-amber-400 to-amber-600" />
-              
+
               <button onClick={() => setStep('order')} className="flex items-center gap-3 group mb-8">
                 <div className="w-12 h-12 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center group-hover:bg-amber-500 text-amber-500 group-hover:text-black transition-all duration-300">
                   <ArrowLeft className="w-5 h-5" />
@@ -844,45 +843,45 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                   <span className="text-2xl font-bold text-amber-500">{totalPrice.toLocaleString()} {t('units.rsd')}</span>
                 </div>
               </div>
-              
+
               <div className="mb-8">
                 <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-3">{tCheckout('title')}</h2>
                 <p className="text-neutral-500">{tCheckout('disclaimer')}</p>
               </div>
-              
+
               <form action={formAction} className="space-y-6">
                 <input type="hidden" name="orderData" value={JSON.stringify(prepareOrderData())} />
                 <input type="hidden" name="locale" value={locale} />
-                
+
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-semibold text-neutral-300 mb-2">{tCheckout('name')}</label>
-                    <input 
-                      required 
-                      name="clientName" 
-                      type="text" 
+                    <input
+                      required
+                      name="clientName"
+                      type="text"
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700"
                       placeholder={tCheckout('namePlaceholder')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-neutral-300 mb-2">{tCheckout('phone')}</label>
-                    <input 
-                      required 
-                      name="clientPhone" 
-                      type="tel" 
+                    <input
+                      required
+                      name="clientPhone"
+                      type="tel"
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700"
                       placeholder={tCheckout('phonePlaceholder')}
                     />
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-semibold text-neutral-300 mb-2">{tCheckout('email')}</label>
-                  <input 
-                    required 
-                    name="clientEmail" 
-                    type="email" 
+                  <input
+                    required
+                    name="clientEmail"
+                    type="email"
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700"
                     placeholder={tCheckout('emailPlaceholder')}
                   />
@@ -891,20 +890,20 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-semibold text-neutral-300 mb-2">{tCheckout('address')}</label>
-                    <input 
-                      required 
-                      name="address" 
-                      type="text" 
+                    <input
+                      required
+                      name="address"
+                      type="text"
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700"
                       placeholder={tCheckout('addressPlaceholder')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-neutral-300 mb-2">{tCheckout('dateTime')}</label>
-                    <input 
-                      required 
-                      name="eventDate" 
-                      type="datetime-local" 
+                    <input
+                      required
+                      name="eventDate"
+                      type="datetime-local"
                       min={new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 16)}
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700 scheme-dark"
                     />
@@ -913,15 +912,15 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
 
                 <div>
                   <label className="block text-sm font-semibold text-neutral-300 mb-2">{tCheckout('note')}</label>
-                  <textarea 
-                    name="message" 
-                    rows={4} 
+                  <textarea
+                    name="message"
+                    rows={4}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition-all duration-300 placeholder:text-neutral-700 resize-none"
                     placeholder={tCheckout('notePlaceholder')}
                   ></textarea>
                 </div>
 
-                <button 
+                <button
                   type="submit"
                   className="w-full py-5 bg-amber-500 text-slate-900 hover:bg-amber-400 rounded-xl font-semibold text-sm uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:shadow-amber-500/20"
                 >
@@ -945,18 +944,18 @@ export default function MenuSelector({ menus }: MenuSelectorProps) {
           >
             <div className="bg-neutral-900/80 backdrop-blur-xl rounded-3xl p-12 border border-white/10 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-green-400 to-green-600" />
-              
+
               <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-8">
                 <Check className="w-12 h-12 text-green-500" />
               </div>
-              
+
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-4">
                 {tCheckout('successTitle') || 'Hvala vam!'}
               </h2>
               <p className="text-neutral-400 text-lg mb-8">
                 {tCheckout('successMessage') || 'Vaša porudžbina je uspešno primljena. Poslali smo vam email sa detaljima.'}
               </p>
-              
+
               <button
                 onClick={() => setStep('menu')}
                 className="px-8 py-4 bg-amber-500 text-black hover:bg-amber-400 rounded-xl font-bold text-sm uppercase tracking-widest transition-all"

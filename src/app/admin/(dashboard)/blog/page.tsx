@@ -2,22 +2,34 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react'
+import Pagination from '@/components/admin/Pagination'
 
-async function getBlogPosts() {
-  return await prisma.blogPost.findMany({
-    include: {
-      author: {
-        select: {
-          name: true,
-          email: true,
+const ITEMS_PER_PAGE = 15
+
+async function getBlogPosts(page: number) {
+  const skip = (page - 1) * ITEMS_PER_PAGE
+
+  const [posts, totalCount] = await Promise.all([
+    prisma.blogPost.findMany({
+      skip,
+      take: ITEMS_PER_PAGE,
+      include: {
+        author: {
+          select: {
+            name: true,
+            email: true,
+          },
         },
+        videoEmbeds: true,
       },
-      videoEmbeds: true,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  })
+      orderBy: {
+        createdAt: 'desc',
+      },
+    }),
+    prisma.blogPost.count()
+  ])
+
+  return { posts, totalCount }
 }
 
 const categoryLabels: Record<string, string> = {
@@ -28,8 +40,15 @@ const categoryLabels: Record<string, string> = {
   BEHIND_SCENES: 'Iza kulisa',
 }
 
-export default async function BlogPage() {
-  const posts = await getBlogPosts()
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const params = await searchParams
+  const currentPage = Number(params.page) || 1
+  const { posts, totalCount } = await getBlogPosts(currentPage)
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
 
   return (
     <div className="space-y-6">
@@ -157,6 +176,13 @@ export default async function BlogPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        baseUrl="/admin/blog"
+      />
     </div>
   )
 }

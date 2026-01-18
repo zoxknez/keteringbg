@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Trash2, Youtube, Instagram, Video, Facebook } from 'lucide-react'
 import MediaLibraryModal from '../MediaLibraryModal'
+import RichTextEditor from './RichTextEditor'
 
 interface VideoEmbed {
   id?: string
@@ -273,18 +274,15 @@ export default function BlogForm({ post, mode }: BlogFormProps) {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Sadržaj *
             </label>
-            <textarea
-              required
-              value={formData.content}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, content: e.target.value }))
+            <RichTextEditor
+              content={formData.content}
+              onChange={(content) =>
+                setFormData((prev) => ({ ...prev, content }))
               }
-              rows={15}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-mono text-sm"
               placeholder="Sadržaj blog posta..."
             />
             <p className="text-xs text-gray-500 mt-1">
-              Podržano: markdown format
+              Koristite toolbar za formatiranje teksta
             </p>
           </div>
 

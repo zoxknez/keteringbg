@@ -26,8 +26,8 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({locale, namespace: 'Metadata'});
- 
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+
   return {
     title: t('title'),
     description: t('description'),
@@ -138,9 +138,10 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <body
         className={`${playfair.variable} ${lato.variable} font-sans antialiased text-neutral-100 min-h-screen flex flex-col selection:bg-amber-500/30`}
+        suppressHydrationWarning
       >
         <script
           type="application/ld+json"

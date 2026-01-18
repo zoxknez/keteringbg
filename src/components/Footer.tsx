@@ -16,9 +16,11 @@ export default async function Footer() {
   return (
     <footer className="relative z-10 bg-black text-neutral-400 border-t border-white/5">
       {/* Main Footer */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
+      <div className="max-w-7xl mx-auto px-6 py-24 relative overflow-hidden">
+        {/* Subtle Background Accent */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-[100px] pointer-events-none" />
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
-          
+
           {/* Brand */}
           <div className="lg:col-span-2 space-y-6">
             <h3 className="text-3xl font-serif font-bold text-white">
@@ -29,23 +31,23 @@ export default async function Footer() {
             </p>
             <div className="flex gap-4 pt-2">
               {facebookUrl && (
-                <a 
-                  href={facebookUrl} 
-                  target="_blank" 
+                <a
+                  href={facebookUrl}
+                  target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Facebook"
-                  className="w-10 h-10 rounded-full bg-neutral-800 hover:bg-amber-500 flex items-center justify-center transition-colors duration-300 text-white"
+                  className="w-12 h-12 rounded-full bg-neutral-900 border border-white/5 hover:border-amber-500/50 flex items-center justify-center transition-all duration-500 text-white hover:scale-110 hover:shadow-xl hover:shadow-amber-500/10"
                 >
                   <Facebook className="w-5 h-5" />
                 </a>
               )}
               {instagramUrl && (
-                <a 
-                  href={instagramUrl} 
-                  target="_blank" 
+                <a
+                  href={instagramUrl}
+                  target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
-                  className="w-10 h-10 rounded-full bg-neutral-800 hover:bg-amber-500 flex items-center justify-center transition-colors duration-300 text-white"
+                  className="w-12 h-12 rounded-full bg-neutral-900 border border-white/5 hover:border-amber-500/50 flex items-center justify-center transition-all duration-500 text-white hover:scale-110 hover:shadow-xl hover:shadow-amber-500/10"
                 >
                   <Instagram className="w-5 h-5" />
                 </a>
@@ -87,8 +89,8 @@ export default async function Footer() {
               <p className="text-neutral-500">PIB: 114970001</p>
               <p className="text-neutral-500">MB: 67992032</p>
               <div className="pt-2">
-                <Link 
-                  href="/blog" 
+                <Link
+                  href="/blog"
                   className="text-amber-500 hover:text-amber-400 transition-colors font-medium"
                 >
                   Blog →
@@ -110,8 +112,8 @@ export default async function Footer() {
               {t('designedBy')} <a href="https://mojportfolio.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors font-medium">o0o0o0o</a>
             </p>
             {/* Discreet Admin Link */}
-            <Link 
-              href="/admin" 
+            <Link
+              href="/admin"
               className="text-neutral-700 hover:text-neutral-500 transition-colors"
               title="Admin"
             >

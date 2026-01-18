@@ -2,12 +2,30 @@ import { prisma } from '@/lib/prisma'
 import DishesTable from '@/components/admin/DishesTable'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
+import Pagination from '@/components/admin/Pagination'
 
-export default async function DishesPage() {
-  const dishes = await prisma.dish.findMany({
-    orderBy: { name: 'asc' },
-    include: { menus: true }
-  })
+const ITEMS_PER_PAGE = 30
+
+export default async function DishesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const params = await searchParams
+  const currentPage = Number(params.page) || 1
+  const skip = (currentPage - 1) * ITEMS_PER_PAGE
+
+  const [dishes, totalCount] = await Promise.all([
+    prisma.dish.findMany({
+      skip,
+      take: ITEMS_PER_PAGE,
+      orderBy: { name: 'asc' },
+      include: { menus: true }
+    }),
+    prisma.dish.count()
+  ])
+
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
 
   return (
     <div className="space-y-6">
@@ -28,6 +46,13 @@ export default async function DishesPage() {
 
       {/* Table */}
       <DishesTable dishes={dishes} />
+
+      {/* Pagination */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        baseUrl="/admin/dishes"
+      />
     </div>
   )
 }

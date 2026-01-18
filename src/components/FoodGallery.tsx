@@ -175,11 +175,11 @@ export default function FoodGallery() {
     <section id="gallery" className="py-24 overflow-hidden relative">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-neutral-950 to-black" />
-      
+
       <div className="relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16 px-6">
-          <motion.span 
+          <motion.span
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -187,7 +187,7 @@ export default function FoodGallery() {
           >
             {t('subtitle')}
           </motion.span>
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -196,7 +196,7 @@ export default function FoodGallery() {
           >
             {t('title')}
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -208,7 +208,7 @@ export default function FoodGallery() {
         </div>
 
         {/* Video Hero */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
@@ -233,10 +233,10 @@ export default function FoodGallery() {
                 }
               }}
             />
-            
+
             {/* Play Button Overlay */}
             {!isVideoPlaying && (
-              <div 
+              <div
                 className="absolute inset-0 flex items-center justify-center bg-black/40 cursor-pointer transition-all duration-300 group-hover:bg-black/30"
                 onClick={() => {
                   if (videoRef.current) {
@@ -245,10 +245,19 @@ export default function FoodGallery() {
                   }
                 }}
               >
-                <motion.div 
+                <motion.div
+                  animate={{
+                    scale: [1, 1.05, 1],
+                    boxShadow: ["0 0 20px rgba(245,158,11,0.3)", "0 0 40px rgba(245,158,11,0.5)", "0 0 20px rgba(245,158,11,0.3)"]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
-                  className="w-24 h-24 rounded-full bg-amber-500 flex items-center justify-center shadow-xl shadow-amber-500/30"
+                  className="w-24 h-24 rounded-full bg-amber-500 flex items-center justify-center shadow-xl"
                 >
                   <Play className="w-10 h-10 text-black ml-1" fill="black" />
                 </motion.div>
@@ -264,7 +273,7 @@ export default function FoodGallery() {
         </motion.div>
 
         {/* Infinite Scroll Gallery - Row 1 */}
-        <div 
+        <div
           ref={scrollRef}
           className="flex gap-4 mb-4 overflow-hidden"
           style={{ width: '200%' }}
@@ -297,10 +306,9 @@ export default function FoodGallery() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05 }}
-                className={`relative rounded-2xl overflow-hidden cursor-pointer group ${
-                  index === 0 ? 'col-span-2 row-span-2 aspect-square' : 'aspect-[4/3]'
-                }`}
-                whileHover={{ scale: 1.02 }}
+                className={`relative rounded-2xl overflow-hidden cursor-pointer group glass-premium ${index === 0 ? 'col-span-2 row-span-2 aspect-square' : 'aspect-[4/3]'
+                  }`}
+                whileHover={{ scale: 1.02, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }}
                 onClick={() => openLightbox(index)}
               >
                 <Image
@@ -310,7 +318,7 @@ export default function FoodGallery() {
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                
+
                 {/* Hover Icon */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="w-12 h-12 rounded-full bg-amber-500/90 flex items-center justify-center">
@@ -324,13 +332,13 @@ export default function FoodGallery() {
           </div>
 
           {/* View All Button */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mt-12"
           >
-            <button 
+            <button
               onClick={() => openLightbox(0)}
               className="px-8 py-4 bg-white/5 hover:bg-amber-500 text-white hover:text-black border border-white/10 hover:border-amber-500 rounded-full font-semibold text-sm uppercase tracking-widest transition-all duration-300"
             >
@@ -406,9 +414,8 @@ export default function FoodGallery() {
                   <button
                     key={`thumb-${index}`}
                     onClick={(e) => { e.stopPropagation(); setSelectedImage(index) }}
-                    className={`relative flex-shrink-0 w-16 h-12 rounded-lg overflow-hidden transition-all duration-300 ${
-                      index === selectedImage ? 'ring-2 ring-amber-500 scale-110' : 'opacity-50 hover:opacity-100'
-                    }`}
+                    className={`relative flex-shrink-0 w-16 h-12 rounded-lg overflow-hidden transition-all duration-300 ${index === selectedImage ? 'ring-2 ring-amber-500 scale-110' : 'opacity-50 hover:opacity-100'
+                      }`}
                   >
                     <Image
                       src={`/dishes/${img}`}

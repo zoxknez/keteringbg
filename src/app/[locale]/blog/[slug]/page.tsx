@@ -3,6 +3,9 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { CalendarDays, Clock, Tag, User, ArrowLeft, Video } from 'lucide-react'
 import VideoEmbedPlayer from '@/components/admin/blog/VideoEmbedPlayer'
+import SocialShare from '@/components/blog/SocialShare'
+import RelatedPosts from '@/components/blog/RelatedPosts'
+import BlogNavbar from '@/components/blog/BlogNavbar'
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 
@@ -29,6 +32,29 @@ async function getBlogPost(slug: string) {
   }
 
   return post
+}
+
+async function getRelatedPosts(category: string, currentSlug: string, limit = 3) {
+  return await prisma.blogPost.findMany({
+    where: {
+      isPublished: true,
+      category: category as any,
+      slug: { not: currentSlug },
+    },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      excerpt: true,
+      coverImage: true,
+      publishedAt: true,
+      content: true,
+    },
+    orderBy: {
+      publishedAt: 'desc',
+    },
+    take: limit,
+  })
 }
 
 export async function generateMetadata({
@@ -71,10 +97,18 @@ export default async function BlogPostPage({
   params: { locale: string; slug: string }
 }) {
   const post = await getBlogPost(slug)
+  const relatedPosts = await getRelatedPosts(post.category, post.slug)
   const t = await getTranslations('Blog')
+
+  // Construct full URL for social sharing
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+  const fullUrl = `${baseUrl}/${locale}/blog/${post.slug}`
 
   return (
     <div className="flex flex-col">
+      {/* Navigation */}
+      <BlogNavbar />
+
       {/* Hero Section */}
       <section className="min-h-[70vh] flex items-end relative px-6 pb-16 pt-32">
         {post.coverImage ? (
@@ -149,10 +183,10 @@ export default async function BlogPostPage({
               <span className="text-neutral-400">
                 {post.publishedAt
                   ? new Date(post.publishedAt).toLocaleDateString('sr-RS', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })
                   : 'N/A'}
               </span>
             </div>
@@ -167,7 +201,7 @@ export default async function BlogPostPage({
       {/* Article Content */}
       <section className="py-16 px-6 relative z-10">
         <div className="max-w-4xl mx-auto">
-          <article className="bg-white/5 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 border border-white/10">
+          <article className="glass-card rounded-3xl shadow-2xl p-8 md:p-12 border border-white/10">
             {/* Main Content */}
             <div className="prose prose-lg prose-invert max-w-none mb-8">
               {post.content.split('\n').map((paragraph, index) => (
@@ -215,7 +249,29 @@ export default async function BlogPostPage({
                 </div>
               </div>
             )}
+
+            {/* Social Share */}
+            <div className="border-t border-white/10 pt-8 mt-8">
+              <SocialShare
+                url={fullUrl}
+                title={post.title}
+                description={post.excerpt || undefined}
+              />
+            </div>
           </article>
+
+          {/* Related Posts */}
+          {relatedPosts.length > 0 && (
+            <RelatedPosts
+              posts={relatedPosts}
+              locale={locale}
+              categoryLabel={categoryLabels[post.category]?.[locale as keyof typeof categoryLabels.NEWS] || categoryLabels[post.category]?.sr}
+              translations={{
+                moreFrom: t('moreFrom') || 'More from',
+                readingTime: t('readingTime') || 'min read',
+              }}
+            />
+          )}
 
           {/* Back to Blog */}
           <div className="mt-12 text-center">

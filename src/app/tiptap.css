@@ -1,0 +1,85 @@
+/* Tiptap Editor Styles */
+.ProseMirror {
+    @apply text-white;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: rgb(163 163 163);
+    pointer-events: none;
+    height: 0;
+}
+
+.ProseMirror:focus {
+    outline: none;
+}
+
+.ProseMirror h1 {
+    @apply text-3xl font-bold mb-4 mt-6;
+}
+
+.ProseMirror h2 {
+    @apply text-2xl font-bold mb-3 mt-5;
+}
+
+.ProseMirror h3 {
+    @apply text-xl font-bold mb-2 mt-4;
+}
+
+.ProseMirror p {
+    @apply mb-3;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+    @apply pl-6 mb-3;
+}
+
+.ProseMirror ul {
+    @apply list-disc;
+}
+
+.ProseMirror ol {
+    @apply list-decimal;
+}
+
+.ProseMirror li {
+    @apply mb-1;
+}
+
+.ProseMirror blockquote {
+    @apply border-l-4 border-amber-500 pl-4 italic my-4 text-neutral-400;
+}
+
+.ProseMirror code {
+    @apply bg-neutral-800 px-1.5 py-0.5 rounded text-sm font-mono text-amber-400;
+}
+
+.ProseMirror pre {
+    @apply bg-neutral-800 p-4 rounded-lg my-4 overflow-x-auto;
+}
+
+.ProseMirror pre code {
+    @apply bg-transparent p-0 text-neutral-300;
+}
+
+.ProseMirror a {
+    @apply text-amber-500 hover:text-amber-400 underline;
+}
+
+.ProseMirror img {
+    @apply max-w-full h-auto rounded-lg my-4;
+}
+
+.ProseMirror strong {
+    @apply font-bold;
+}
+
+.ProseMirror em {
+    @apply italic;
+}
+
+.ProseMirror s {
+    @apply line-through;
+}

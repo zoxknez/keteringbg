@@ -162,7 +162,8 @@
     "description": "Svako jelo pripremamo sa ljubavlju i pažnjom, koristeći samo najsvežije sastojke.",
     "video": "Video",
     "viewAll": "Pogledajte Sve Slike",
-    "dishAlt": "Jelo"  },
+    "dishAlt": "Jelo"
+  },
   "Blog": {
     "title": "Blog",
     "subtitle": "Recepti, saveti i priče iz našeg ketering sveta",
@@ -172,11 +173,16 @@
     "readingTime": "min čitanja",
     "videoContent": "Video Sadržaj",
     "noPosts": "Trenutno nema objavljenih postova.",
+    "featured": "Istaknuto",
+    "searchPlaceholder": "Pretraži postove...",
+    "noResults": "Nema postova koji odgovaraju vašoj pretrazi",
+    "moreFrom": "Više iz",
     "categories": {
       "NEWS": "Vesti",
       "RECIPES": "Recepti",
       "EVENTS": "Događaji",
       "TIPS": "Saveti",
       "BEHIND_SCENES": "Iza kulisa"
-    }  }
+    }
+  }
 }
